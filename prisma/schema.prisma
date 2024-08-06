@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ticket {
+  id         Int      @id @default(autoincrement())
+  title      String
+  url        String? 
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  tasks      Task[]
+}
+
+model Task {
+  id           Int           @id @default(autoincrement())
+  title        String
+  status       Int
+  type         Int
+  ticket       Ticket        @relation(fields: [ticketId], references: [id])
+  ticketId     Int           @map("ticket_id")
+  parent       Task?         @relation("Subtasks", fields: [parentId], references: [id])
+  subtasks     Task[]        @relation("Subtasks")
+  parentId     Int?          @map("parent_id")
+  plans        Plan[]
+  achievements Achievement[]
+  checks       Check[]
+  feedbacks    Feedback[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+}
+
+model Plan {
+  id                     Int       @id @default(autoincrement())
+  taskId                 Int       @map("task_id")
+  firstTimeRequired      DateTime? @map("first_time_required")
+  firstInvestigationTime DateTime? @map("first_investigation_time")
+  lastInvestigationTime  DateTime? @map("last_investigation_time")
+  investigatedTime       DateTime? @map("investigated_time")
+  task                   Task      @relation(fields: [taskId], references: [id])
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+}
+
+model Achievement {
+  id            Int       @id @default(autoincrement())
+  taskId        Int       @map("task_id")
+  doneDate      DateTime? @map("done_date")
+  operatingTime Int?      @map("operating_time")
+  task          Task      @relation(fields: [taskId], references: [id])
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+}
+
+model Check {
+  id         Int      @id @default(autoincrement())
+  taskId     Int      @map("task_id")
+  analysis   String?
+  task       Task     @relation(fields: [taskId], references: [id])
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+}
+
+model Feedback {
+  id           Int      @id @default(autoincrement())
+  taskId       Int      @map("task_id")
+  issues       String?
+  improvements String?
+  task         Task     @relation(fields: [taskId], references: [id])
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+}
