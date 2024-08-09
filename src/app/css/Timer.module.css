@@ -1,0 +1,15 @@
+.operatingTimer {
+  text-align: center;
+  background-color: rgba(242, 126, 84, 0.871);
+  width: 400px;
+  border: solid;
+  margin: 10px;
+}
+
+.restTimer {
+  text-align: center;
+  background-color: rgba(144, 211, 129, 0.932);
+  width: 400px;
+  border: solid;
+  margin: 10px;
+}
