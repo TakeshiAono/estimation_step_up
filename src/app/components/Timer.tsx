@@ -7,13 +7,14 @@ import operationEndSound from './../assets/operation_end.mp3';
 // @ts-ignore
 import restEndSound from './../assets/rest_end.mp3';
 import styles from "../css/Timer.module.css"
+import { VirtualWindow } from "@react-libraries/virtual-window";
 
 const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
   const [operatingMinutes, setOperatingMinutes] = useState<number>(25)
   const [restMinutes, setRestMinutes] = useState<number>(5)
   const [isRestSetting, setIsRestSetting] = useState(false)
   const [operationSoundPlay] = useSound(operationEndSound, {volume: 0.3});
-  const [restSoundPlay] = useSound(restEndSound, {volume: 0.3});
+  const [restSoundPlay] = useSound(restEndSound, {volume: 1});
   const [isInputHidden, setIsInputHidden] = useState(false)
 
   const settingDateObject = (min: number) => {
@@ -81,34 +82,36 @@ const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
   }
 
   return (
-    <div className={isRestSetting ? styles.restTimer : styles.operatingTimer}>
-      <h1>ポモドーロタイマー </h1>
-      <div style={{fontSize: '100px'}}>
-        <span>{minutes}</span>:<span>{seconds}</span>
-      </div>
-      <Button sx={{marginBottom: "10px"}} variant="contained" size={"small"} color="inherit" onClick={() => {setIsInputHidden(!isInputHidden)}}>Hidden</Button>
-      { isInputHidden ||
-        <div style={{backgroundColor: "white", padding:"20px"}}>
-          <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <InputLabel>作業時間</InputLabel>
-            <TextField type="number" value={operatingMinutes} color="primary" onChange={(event) => {setOperatingMinutes(Number(event.target.value))}}/>
-          </div>
-          <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <InputLabel>休憩時間</InputLabel>
-            <TextField type="number" value={restMinutes} color="primary" onChange={(event) => {setRestMinutes(Number(event.target.value))}}/>
-          </div>
+    <VirtualWindow title="Timer" width={300} height={400} titleButtons={{max: false, min: false, close: false}}>
+      <div className={isRestSetting ? styles.restTimer : styles.operatingTimer}>
+        <h1>ポモドーロタイマー </h1>
+        <div style={{fontSize: '100px'}}>
+          <span>{minutes}</span>:<span>{seconds}</span>
         </div>
-      }
-      <div style={{backgroundColor: "white", display: "flex", justifyContent: "space-around", padding: "20px"}}>
-        <Button variant="contained" size={"small"} onClick={start}>Start</Button>
-        <Button variant="contained" size={"small"} color="error" onClick={pause}>Pause</Button>
-        <Button variant="contained" size={"small"} color="success" onClick={() => {
-          switchSetting()
-          selectedRestart(false)
-        }}>Switching</Button>
-        <Button variant="contained" size={"small"} color="secondary" onClick={() => selectedRestart(false)}>Reset</Button>
+        <Button sx={{marginBottom: "10px"}} variant="contained" size={"small"} color="inherit" onClick={() => {setIsInputHidden(!isInputHidden)}}>Hidden</Button>
+        { isInputHidden ||
+          <div style={{backgroundColor: "white", padding:"20px"}}>
+            <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+              <InputLabel>作業時間</InputLabel>
+              <TextField type="number" value={operatingMinutes} color="primary" onChange={(event) => {setOperatingMinutes(Number(event.target.value))}}/>
+            </div>
+            <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+              <InputLabel>休憩時間</InputLabel>
+              <TextField type="number" value={restMinutes} color="primary" onChange={(event) => {setRestMinutes(Number(event.target.value))}}/>
+            </div>
+          </div>
+        }
+        <div style={{backgroundColor: "white", display: "flex", justifyContent: "space-around", padding: "20px"}}>
+          <Button variant="contained" size={"small"} onClick={start}>Start</Button>
+          <Button variant="contained" size={"small"} color="error" onClick={pause}>Pause</Button>
+          <Button variant="contained" size={"small"} color="success" onClick={() => {
+            switchSetting()
+            selectedRestart(false)
+          }}>Switching</Button>
+          <Button variant="contained" size={"small"} color="secondary" onClick={() => selectedRestart(false)}>Reset</Button>
+        </div>
       </div>
-    </div>
+    </VirtualWindow>
   )
 }
 

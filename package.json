@@ -17,6 +17,7 @@
     "@mui/material": "^5.16.6",
     "@mui/material-nextjs": "^5.16.6",
     "@prisma/client": "^5.17.0",
+    "@react-libraries/virtual-window": "^1.0.8",
     "@types/lodash": "^4.17.7",
     "axios": "^1.7.3",
     "file-loader": "^6.2.0",
