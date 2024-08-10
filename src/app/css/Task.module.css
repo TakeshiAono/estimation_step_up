@@ -1,0 +1,16 @@
+.ticket {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border: solid;
+  padding: 20px 0px;
+  border-radius: 30px;
+}
+
+.shortInput {
+  width: 100px;
+}
+
+.test { 
+  border: solid;
+}
