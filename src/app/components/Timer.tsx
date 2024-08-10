@@ -81,7 +81,7 @@ const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
   }
 
   return (
-    <VirtualWindow title="Timer" width={300} height={400} titleButtons={{max: false, min: false, close: false}}>
+    <VirtualWindow title="Timer" x={700} y={300} width={300} height={400} titleButtons={{max: false, min: false, close: false}}>
       <div className={isResting ? styles.restTimer : styles.operatingTimer}>
         <h1>ポモドーロタイマー </h1>
         <div style={{fontSize: '100px'}}>

@@ -6,8 +6,9 @@ import Timer from "./components/Timer";
 import _ from "lodash";
 import Nestable from 'react-nestable';
 import { Button } from "@mui/material";
+import Link from "next/link";
 
-export default function Home() {
+export default function TaskView() {
   const createTaskItems = (taskIds: number[]) => {
     return taskIds.map(taskId => {
       return ({ id : taskId, children: null})
@@ -26,6 +27,9 @@ export default function Home() {
         ? <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク表示</Button>
         : <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク非表示</Button>
       }
+      <Link style={{display: "inline-block", marginLeft: "30px"}} href="/tickets">
+        <p>チケット一覧へ</p>
+      </Link>
       { taskItems &&
         <Nestable
           items={taskItems}
