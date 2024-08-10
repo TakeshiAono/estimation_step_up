@@ -19,7 +19,6 @@ const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
 
   const settingDateObject = (min: number) => {
     const date = new Date()
-    console.log(date)
     date.setSeconds(date.getSeconds() + min * 60)
     return date
   }
