@@ -12,20 +12,19 @@ import { VirtualWindow } from "@react-libraries/virtual-window";
 const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
   const [operatingMinutes, setOperatingMinutes] = useState<number>(25)
   const [restMinutes, setRestMinutes] = useState<number>(5)
-  const [isRestSetting, setIsRestSetting] = useState(false)
+  const [isResting, setIsResting] = useState(false)
   const [operationSoundPlay] = useSound(operationEndSound, {volume: 0.3});
   const [restSoundPlay] = useSound(restEndSound, {volume: 1});
   const [isInputHidden, setIsInputHidden] = useState(false)
 
   const settingDateObject = (min: number) => {
     const date = new Date()
-    console.log(date)
     date.setSeconds(date.getSeconds() + min * 60)
     return date
   }
 
   const soundPlay = () => {
-    isRestSetting
+    isResting
       ? (() => {
         restSoundPlay()
         restart(settingDateObject(restMinutes), false)
@@ -46,7 +45,7 @@ const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
     resume,
     restart,
   } = useTimer({
-    expiryTimestamp: isRestSetting ? settingDateObject(restMinutes) : settingDateObject(operatingMinutes),
+    expiryTimestamp: isResting ? settingDateObject(restMinutes) : settingDateObject(operatingMinutes),
     onExpire: soundPlay
   });
 
@@ -55,35 +54,35 @@ const Timer = ({onTimerUpdate}: {onTimerUpdate: (number: number) => void}) => {
   }, [])
 
   useEffect(() => {
-    !isRestSetting && restart(settingDateObject(operatingMinutes), false)
+    !isResting && restart(settingDateObject(operatingMinutes), false)
   }, [operatingMinutes])
 
   useEffect(() => {
-    isRestSetting && restart(settingDateObject(restMinutes), false)
+    isResting && restart(settingDateObject(restMinutes), false)
   }, [restMinutes])
 
   useEffect(() => {
-    onTimerUpdate(totalSeconds)
+    isResting || onTimerUpdate(totalSeconds)
   }, [totalSeconds])
 
   useEffect(() => {
-    isRestSetting ? restart(settingDateObject(restMinutes), false) : restart(settingDateObject(operatingMinutes), false)
-  }, [isRestSetting])
+    isResting ? restart(settingDateObject(restMinutes), false) : restart(settingDateObject(operatingMinutes), false)
+  }, [isResting])
 
   useEffect(() => {
   }, [operatingMinutes])
 
   const switchSetting = async () => {
-    setIsRestSetting(!isRestSetting)
+    setIsResting(!isResting)
   }
 
   const selectedRestart = (isAutoStart: boolean) => {
-    isRestSetting ? restart(settingDateObject(restMinutes), isAutoStart) : restart(settingDateObject(operatingMinutes), isAutoStart)
+    isResting ? restart(settingDateObject(restMinutes), isAutoStart) : restart(settingDateObject(operatingMinutes), isAutoStart)
   }
 
   return (
     <VirtualWindow title="Timer" width={300} height={400} titleButtons={{max: false, min: false, close: false}}>
-      <div className={isRestSetting ? styles.restTimer : styles.operatingTimer}>
+      <div className={isResting ? styles.restTimer : styles.operatingTimer}>
         <h1>ポモドーロタイマー </h1>
         <div style={{fontSize: '100px'}}>
           <span>{minutes}</span>:<span>{seconds}</span>

@@ -1,0 +1,25 @@
+.task {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: end;
+  border: solid;
+  padding: 20px 0px;
+  border-radius: 30px;
+  margin: 20px;
+  height: 80px;
+  width:max-content
+}
+
+.shortInput {
+  width: 100px;
+}
+
+.operatedTime {
+  margin-bottom: auto;
+  margin-left: 30px;
+}
+
+.taskColumn {
+  margin-left: 30px;
+}
