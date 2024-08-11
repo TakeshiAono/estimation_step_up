@@ -100,7 +100,7 @@ a {
   }
 } */
 
-@media only screen and (min-width: 960px) and ( max-width:1281px) 
+/* @media only screen and (min-width: 960px) and ( max-width:1281px) 
 {
   html {
   transition: transform 0.3s;
@@ -109,4 +109,4 @@ a {
   height: calc(100% / 0.8);
   width: calc(100% / 0.8);
   }
-}
+} */

@@ -16,10 +16,24 @@ export default function TaskView() {
   }
 
   const [seconds, setSeconds] = useState(0);
-  const [taskItems, setTaskItems] = useState<{ id: number; component: Element, children: any }[]>(createTaskItems([0,1,2,3]))
+  const taskIds = [1,2,3].sort().reverse()
+  const [taskItems, setTaskItems] = useState<{ id: number; children: any }[]>(createTaskItems(taskIds))
   const [isHidden, setIsHidden] = useState(false)
 
   const renderTask = ({ item }: {item: any}) => <Task key={item.id} seconds={seconds} id={item.id} />;
+
+  const createTask = () => {
+    const foundItem = _.maxBy(taskItems, (item) => item.id)
+
+    let nextId
+    if (foundItem) {
+      nextId = foundItem.id + 1
+    } else {
+      nextId = 1
+    }
+
+    setTaskItems([{ id: nextId, children: [] }, ...taskItems])
+  }
 
   return (
     <>
@@ -30,6 +44,7 @@ export default function TaskView() {
       <Link style={{display: "inline-block", marginLeft: "30px"}} href="/tickets">
         <p>チケット一覧へ</p>
       </Link>
+      <Button variant="contained" onClick={createTask}>タスク追加</Button>
       { taskItems &&
         <Nestable
           items={taskItems}
