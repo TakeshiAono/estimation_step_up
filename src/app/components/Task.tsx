@@ -83,11 +83,6 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
         <TextField variant="outlined" disabled={!isEditing} value={title} onChange={(event) => {setTitle(event.target.value)}}/>
       </div>
       {
-        isParentTask
-          ? <Button variant="contained" color="error" onClick={switchParentTask}>親タスク解除</Button>
-          : <Button variant="contained" color="success" onClick={switchParentTask}>子タスク追加</Button>
-      }
-      {
         isParentTask || (
           <>
             <div className={styles.taskColumn}>
