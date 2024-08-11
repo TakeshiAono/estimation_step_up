@@ -15,10 +15,21 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
   const [isParentTask, setIsParentTask] = useState(false)
   const [operatingTime, setOperatingTime] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
+  const [ticketItems, setTicketItems] = useState<any>([])
 
   useEffect(() => {
     isOperatingTask && setOperatingTime(operatingTime + 1)
   }, [seconds])
+
+  // TODO: ticketsはstoreで状態管理させる
+  useEffect(() => {
+    const fetchTickets = async () => {
+      const {data} = await axios.get("http://localhost:3000/api/tickets")
+      console.log(data)
+      return data.sort((item) => item.id).reverse()
+    }
+    fetchTickets().then((reuslt) => {setTicketItems(reuslt)})
+  }, [])
 
   const taskTypes = {
     "初回タスク": 0,
@@ -63,7 +74,10 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
       <div className={styles.inputBlock}>
         <InputLabel>チケット番号</InputLabel>
         <Select disabled={!isEditing} defaultValue={1}>
-          {tickets.map((ticket)=>(<MenuItem disabled={!isEditing} key={ticket} value={ticket}>{ticket}</MenuItem>))}
+          {/* TODO: ticketsはstoreで状態管理させる */}
+          {ticketItems.map((ticket)=>{
+            return ticket.status != 2 && <MenuItem disabled={!isEditing} key={ticket.id} value={ticket.id}>{ticket.title}</MenuItem>
+          })}
         </Select>
       </div>
       <div className={styles.inputBlock}>
