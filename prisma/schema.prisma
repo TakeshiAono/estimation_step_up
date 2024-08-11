@@ -14,12 +14,14 @@ datasource db {
 }
 
 model Ticket {
-  id         Int      @id @default(autoincrement())
-  title      String
-  url        String? 
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  tasks      Task[]
+  id        Int      @id @default(autoincrement())
+  title     String
+  url       String?
+  status    Int
+  totalTime Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  tasks     Task[]
 }
 
 model Task {
@@ -63,12 +65,12 @@ model Achievement {
 }
 
 model Check {
-  id         Int      @id @default(autoincrement())
-  taskId     Int      @map("task_id")
-  analysis   String?
-  task       Task     @relation(fields: [taskId], references: [id])
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id        Int      @id @default(autoincrement())
+  taskId    Int      @map("task_id")
+  analysis  String?
+  task      Task     @relation(fields: [taskId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model Feedback {

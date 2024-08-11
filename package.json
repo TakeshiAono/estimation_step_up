@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "server-start": "brew services start postgresql",
+    "pformat": "npx prisma format",
     "migrate": "npx prisma migrate dev",
     "dev": "next dev",
     "build": "next build",

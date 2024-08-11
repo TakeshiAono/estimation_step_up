@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import _ from "lodash";
 import {
   Button,
@@ -19,18 +19,29 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import Modal from "../components/Modal";
+import axios from "axios";
 
 export default function TicketView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [statusId, setStatusId] = useState("notYet");
+  const [status, setStatus] = useState("notYet");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [ticketItems, setTicketItems] = useState<any>([])
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      const {data} = await axios.get("http://localhost:3000/api/tickets")
+      console.log(data)
+      return data.sort((item) => item.id).reverse()
+    }
+    fetchTickets().then((reuslt) => {setTicketItems(reuslt)})
+  }, [])
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -46,7 +57,7 @@ export default function TicketView() {
   }
 
   interface Column {
-    id: "ticketId" | "title" | "url" | "numberOfTask" | "totalTime" | "status";
+    id: "id" | "title" | "url" | "numberOfTask" | "totalTime" | "status";
     label: string;
     minWidth?: number;
     align?: "right";
@@ -54,7 +65,7 @@ export default function TicketView() {
   }
 
   const columns: readonly Column[] = [
-    { id: "ticketId", label: "TicketID", minWidth: 20 },
+    { id: "id", label: "TicketID", minWidth: 20 },
     { id: "status", label: "状況", minWidth: 50 },
     { id: "title", label: "title", minWidth: 50 },
     { id: "url", label: "URL", minWidth: 100 },
@@ -63,43 +74,35 @@ export default function TicketView() {
   ];
 
   function createData(
-    ticketId: string,
-    status: number,
+    id: string,
+    status: string,
     title: string,
     url: number,
     numberOfTask: number,
     totalTime: number
   ) {
-    return { ticketId, status, title, url, numberOfTask, totalTime };
+    return { id, status, title, url, numberOfTask, totalTime };
   }
 
-  const rows = [
-    createData("1", "notYet", "test1", 1324171354, 3287263, 1),
-    createData("2", "run", "test1", 1403500365, 9596961, 1),
-    createData("3", "run", "test1", 60483973, 301340, 1),
-    createData("4", "run", "US", 327167434, 9833520, 1),
-    createData("5", "run", "CA", 37602103, 9984670, 1),
-    createData("6", "run", "AU", 25475400, 7692024, 1),
-    createData("7", "run", "DE", 83019200, 357578, 1),
-  ].sort((a, b) => Number(a.ticketId) - Number(b.ticketId)).reverse();
-
-  const [ticketItems, setTicketItems] = useState<any>(rows)
-
-  const createTicket = () => {
-    console.log("statusId",statusId)
-
-    const foundItem = _.maxBy(ticketItems, (item) => Number(item.ticketId))
+  const createTicket = async () => {
+    const foundItem = _.maxBy(ticketItems, (item) => Number(item.id))
 
     let nextId
     if (foundItem) {
-      nextId = Number(foundItem.ticketId) + 1
+      nextId = Number(foundItem.id) + 1
     } else {
       nextId = 1
     }
 
-    const newItem = createData(nextId.toString(), statusId, title, url, 0, 0)
-
-    setTicketItems([ newItem, ...ticketItems])
+    try {
+      await axios.post(`http://localhost:3000/api/tickets`, JSON.stringify({title: title, status: ticketStatuses[status], url: url}))
+      const newItem = createData(nextId.toString(), ticketStatuses[status], title, url, 0, 0)
+      setTicketItems([ newItem, ...ticketItems])
+    } catch (e) {
+      console.log("リクエストエラー")
+    } finally {
+      closeModal()
+    }
   }
 
   const openModal = () => {
@@ -111,7 +114,7 @@ export default function TicketView() {
   }
 
   const changeStatusId = (event) => {
-    setStatusId(
+    setStatus(
       event.target.value,
     );
   };
@@ -124,7 +127,6 @@ export default function TicketView() {
       <Link href="/">
         <p>タスク一覧へ</p>
       </Link>
-      {/* <Button variant="contained" onClick={createTicket}>チケット追加</Button> */}
       <TableContainer sx={{ maxHeight: 800 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -145,7 +147,7 @@ export default function TicketView() {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.ticketId}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
@@ -165,7 +167,7 @@ export default function TicketView() {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={ticketItems.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -185,7 +187,7 @@ export default function TicketView() {
           <FormControl variant="outlined" sx={{ minWidth: 120 }}>
             <InputLabel id="demo-simple-select-label">Status</InputLabel>
             <Select
-              value={statusId}
+              value={status}
               label={"Status"}
               onChange={changeStatusId}
             >

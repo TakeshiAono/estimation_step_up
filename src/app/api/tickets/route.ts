@@ -1,17 +1,37 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest): Promise<Promise<unknown>> {
+export async function GET(): Promise<Promise<unknown>> {
   const prisma = new PrismaClient()
   let result = null
   let status = 200
 
   try {
-    const data = { createdAt: new Date(), updatedAt: new Date(), ...await request.json() }
+    // const {url, title, status} = await request.json()
+    result = await prisma.ticket.findMany()
+    console.log("index complete")
+  } catch(e) {
+    status = 400
+  } finally {
+    return NextResponse.json(result, {status: status});
+  }
+}
+
+export async function POST(request: NextRequest, {params}: {params: Ticket}): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient()
+  let result = null
+  let status = 200
+
+  try {
+    const {url, title, status} = await request.json()
     result = await prisma.ticket.create({
-      data: data
+      data: {
+        url: url,
+        title: title,
+        status: status
+      }
     })
-    console.log("update complete")
+    console.log("create complete")
   } catch(e) {
     status = 400
   } finally {
