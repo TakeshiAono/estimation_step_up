@@ -37,6 +37,7 @@ export default function TaskView() {
 
   return (
     <>
+      <Button variant="contained" color="warning" onClick={() => {console.log("タスク更新")}} style={{marginRight: "20px"}}>タスク更新</Button>
       { isHidden
         ? <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク表示</Button>
         : <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク非表示</Button>
