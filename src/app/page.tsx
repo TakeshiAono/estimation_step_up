@@ -19,8 +19,9 @@ export default function TaskView() {
   const taskIds = [1,2,3].sort().reverse()
   const [taskItems, setTaskItems] = useState<{ id: number; children: any }[]>(createTaskItems(taskIds))
   const [isHidden, setIsHidden] = useState(false)
+  const [operatingTaskId, setOperatingTaskId] = useState(null)
 
-  const renderTask = ({ item }: {item: any}) => <Task key={item.id} seconds={seconds} id={item.id} />;
+  const renderTask = ({ item }: {item: any}) => <Task key={item.id} seconds={seconds} id={item.id} onSelectOperatingTask={setOperatingTaskId} operatingTaskId={operatingTaskId} />;
 
   const createTask = () => {
     const foundItem = _.maxBy(taskItems, (item) => item.id)

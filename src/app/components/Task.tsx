@@ -8,7 +8,7 @@ interface props {
   tickets: any;
 }
 
-const Task = ({seconds, id}: {seconds: number, id: number}) => {
+const Task = ({seconds, id, operatingTaskId, onSelectOperatingTask}: {seconds: number, id: number, operatingTaskId: number, onSelectOperatingTask: () => void}) => {
   const [tickets, setTickets] = useState([1,2,3])
   const [isOperatingTask, setIsOperatingTask] = useState(false)
   const [title, setTitle] = useState("")
@@ -18,7 +18,7 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
   const [ticketItems, setTicketItems] = useState<any>([])
 
   useEffect(() => {
-    isOperatingTask && setOperatingTime(operatingTime + 1)
+    operatingTaskId == id && setOperatingTime(operatingTime + 1)
   }, [seconds])
 
   // TODO: ticketsはstoreで状態管理させる
@@ -46,7 +46,7 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
   };
 
   const switchOperatingTask = () => {
-    setIsOperatingTask(!isOperatingTask)
+    onSelectOperatingTask(id)
   }
 
   const switchParentTask = () => {
@@ -57,7 +57,7 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
     <div className={styles.task} style={isEditing ? {backgroundColor: "white"} : {backgroundColor: "lightgray"}}>
       <div style={{display: "flex", flexDirection: "column"}}>
         {
-          isParentTask || (isOperatingTask
+          isParentTask || (operatingTaskId == id
             ? <Button variant="contained" color="warning" onClick={switchOperatingTask}>作業終了</Button>
             : <Button variant="contained" color="success" onClick={switchOperatingTask}>作業開始</Button>
           )
@@ -69,7 +69,11 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
           )
         }
       </div>
-      <div>
+      <div className={styles.operatedTime}>
+        <InputLabel>実働時間(調査時間を含む)</InputLabel>
+        <p style={{fontSize: "40px", alignItems: "center", margin: "0px"}}>
+          {Math.floor(operatingTime/3600)}:{Math.floor(operatingTime/60)}:{operatingTime % 60}
+        </p>
       </div>
       <div className={styles.inputBlock}>
         <InputLabel>チケット番号</InputLabel>
@@ -120,12 +124,6 @@ const Task = ({seconds, id}: {seconds: number, id: number}) => {
             <div className={styles.taskColumn}>
               <InputLabel>調査内容</InputLabel>
               <TextField disabled={!isEditing} variant="outlined" multiline />
-            </div>
-            <div className={styles.operatedTime}>
-              <InputLabel>実働時間(調査時間を含む)</InputLabel>
-              <p style={{fontSize: "40px", alignItems: "center", margin: "0px"}}>
-                {Math.floor(operatingTime/3600)}:{Math.floor(operatingTime/60)}:{operatingTime % 60}
-              </p>
             </div>
           </>
         )
