@@ -41,7 +41,8 @@ export default function TaskView() {
         ? <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク表示</Button>
         : <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク非表示</Button>
       }
-      <Link style={{display: "inline-block", marginLeft: "30px"}} href="/tickets">
+
+      <Link target={"_blank"} style={{display: "inline-block", marginLeft: "30px"}} href="/tickets">
         <p>チケット一覧へ</p>
       </Link>
       <Button variant="contained" onClick={createTask}>タスク追加</Button>
