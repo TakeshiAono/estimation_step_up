@@ -1,31 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Task from "./components/Task";
 import Timer from "./components/Timer";
 import _ from "lodash";
 import Nestable from 'react-nestable';
 import { Button } from "@mui/material";
 import Link from "next/link";
+import axios from "axios";
+import { Statuses } from "./constants/TaskConstants";
+import type { Task } from "@/schema/zod";
 
 export default function TaskView() {
-  const createTaskItems = (taskIds: number[]) => {
-    return taskIds.map(taskId => {
-      return ({ id : taskId, children: null})
-    })
-  }
-
   const [seconds, setSeconds] = useState(0);
   const taskIds = [1,2,3].sort().reverse()
-  const [taskItems, setTaskItems] = useState<{ id: number; children: any }[]>(createTaskItems(taskIds))
+  const [taskItems, setTaskItems] = useState<Task[]>([])
   const [isHidden, setIsHidden] = useState(false)
   const [operatingTaskId, setOperatingTaskId] = useState(null)
 
-  const renderTask = ({ item }: {item: any}) => <Task key={item.id} seconds={seconds} id={item.id} onSelectOperatingTask={setOperatingTaskId} operatingTaskId={operatingTaskId} />;
+  const renderTask = ({ item }: {item: Task}) => {return (
+    <>
+      <Task 
+        key={item.id}
+        seconds={seconds}
+        onSelectOperatingTask={setOperatingTaskId}
+        operatingTaskId={operatingTaskId} task={item}
+        achievements={item.achievements[0]}
+        plans={item.plans[0]}
+        feedbacks={item.feedbacks[0]}
+        checks={item.checks[0]}
+      />
+    </>
+  )};
 
-  const createTask = () => {
+  useEffect(() => {
+    const fetchTaskItems = async () => {
+      const {data} = await fetchTasks()
+      return data
+    }
+    
+    fetchTaskItems().then((data) => {
+      setTaskItems(data)
+    })
+  }, [])
+  
+  const createNewTask = async () => {
     const foundItem = _.maxBy(taskItems, (item) => item.id)
-
     let nextId
     if (foundItem) {
       nextId = foundItem.id + 1
@@ -33,7 +53,29 @@ export default function TaskView() {
       nextId = 1
     }
 
-    setTaskItems([{ id: nextId, children: [] }, ...taskItems])
+    try {
+      const { data } = await storeTask({isSurveyTask: false, status: Statuses.NotYet, type: 2, title: "fff"})
+      setTaskItems([{ ...data, id: nextId, children: [] }, ...taskItems])
+    } catch (error) {
+      console.log("Error: ", error)
+    }
+  }
+
+  const storeTask = async ({isSurveyTask, status, type, title, parentId = null, ticketId = null}: Task) => {
+    return await axios.post<Task>(`http://localhost:3000/api/tasks/create`,
+      JSON.stringify({
+        isSurveyTask: isSurveyTask,
+        status: status,
+        type: type,
+        ticketId: ticketId,
+        title: title,
+        parentId: parentId,
+      })
+    )
+  }
+
+  const fetchTasks = async () => {
+    return await axios.get(`http://localhost:3000/api/tasks`)
   }
 
   return (
@@ -47,7 +89,7 @@ export default function TaskView() {
       <Link target={"_blank"} style={{display: "inline-block", marginLeft: "30px"}} href="/tickets">
         <p>チケット一覧へ</p>
       </Link>
-      <Button variant="contained" onClick={createTask}>タスク追加</Button>
+      <Button variant="contained" onClick={createNewTask}>タスク追加</Button>
       { taskItems &&
         <Nestable
           items={taskItems}

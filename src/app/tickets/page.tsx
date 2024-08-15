@@ -25,7 +25,7 @@ export default function TicketView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [status, setStatus] = useState("notYet");
+  const [status, setStatus] = useState("NotYet");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [ticketItems, setTicketItems] = useState<any>([])
@@ -50,10 +50,10 @@ export default function TicketView() {
     setPage(0);
   };
 
-  const ticketStatuses = {
-    notYet: 0,
-    run: 1,
-    done: 2
+  const TicketStatuses = {
+    NotYet: 0,
+    Run: 1,
+    Done: 2
   }
 
   interface Column {
@@ -95,8 +95,8 @@ export default function TicketView() {
     }
 
     try {
-      await axios.post(`http://localhost:3000/api/tickets`, JSON.stringify({title: title, status: ticketStatuses[status], url: url}))
-      const newItem = createData(nextId.toString(), ticketStatuses[status], title, url, 0, 0)
+      await axios.post(`http://localhost:3000/api/tickets/create`, JSON.stringify({title: title, status: TicketStatuses[status], url: url}))
+      const newItem = createData(nextId.toString(), TicketStatuses[status], title, url, 0, 0)
       setTicketItems([ newItem, ...ticketItems])
     } catch (e) {
       console.log("リクエストエラー")
@@ -191,9 +191,9 @@ export default function TicketView() {
               label={"Status"}
               onChange={changeStatusId}
             >
-              <MenuItem value={"notYet"}>未実施</MenuItem>
-              <MenuItem value={"run"}>実行中</MenuItem>
-              <MenuItem value={"done"}>完了</MenuItem>
+              <MenuItem value={"NotYet"}>未実施</MenuItem>
+              <MenuItem value={"Run"}>実行中</MenuItem>
+              <MenuItem value={"Done"}>完了</MenuItem>
             </Select>
           </FormControl>
           <TextField label="URL" variant="outlined" onChange={(e) => {setUrl(e.target.value)}}/>
