@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
-import { Button, InputLabel, TextField } from "@mui/material";
+import { Button, InputLabel, Slider, Stack, TextField } from "@mui/material";
 // @ts-ignore
 import operationEndSound from "./../assets/operation_end.mp3";
 // @ts-ignore
 import restEndSound from "./../assets/rest_end.mp3";
 import styles from "../css/Timer.module.css";
 import { VirtualWindow } from "@react-libraries/virtual-window";
+import VolumeDownIcon from '@mui/icons-material/VolumeDown';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 var worker = new Worker(new URL("../../libs/secondsTimer.ts", import.meta.url));
 
@@ -18,8 +20,9 @@ const Timer = ({
   const [operatingSeconds, setOperatingSeconds] = useState<number>(25 * 60);
   const [restSeconds, setRestSeconds] = useState<number>(5 * 60);
   const [isResting, setIsResting] = useState(false);
-  const [operationSoundPlay] = useSound(operationEndSound, { volume: 0.3 });
-  const [restSoundPlay] = useSound(restEndSound, { volume: 1 });
+  const [volume, setVolume] = useState(50)
+  const [operationSoundPlay] = useSound(operationEndSound, { volume: volume / 100 });
+  const [restSoundPlay] = useSound(restEndSound, { volume: volume / 100 });
   const [isInputHidden, setIsInputHidden] = useState(false);
   const [sumTime, setSumTime] = useState(0);
   const [isStarting, setIsStarting] = useState(false);
@@ -162,6 +165,11 @@ const Timer = ({
             </div>
           </div>
         )}
+        <Stack spacing={2} direction="row" sx={{ backgroundColor: "white" }} alignItems="center">
+          <VolumeDownIcon/>
+            <Slider style={{backgroundColor: "white"}} aria-label="Volume" value={volume} onChange={(e) => {setVolume(e.target.value)}} />
+          <VolumeUpIcon/>
+        </Stack>
         <div
           style={{
             backgroundColor: "white",
