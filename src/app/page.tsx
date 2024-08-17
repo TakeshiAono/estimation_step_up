@@ -13,7 +13,6 @@ import type { Task } from "@/schema/zod";
 
 export default function TaskView() {
   const [seconds, setSeconds] = useState(0);
-  const taskIds = [1,2,3].sort().reverse()
   const [taskItems, setTaskItems] = useState<Task[]>([])
   const [isHidden, setIsHidden] = useState(false)
   const [operatingTaskId, setOperatingTaskId] = useState(null)
@@ -29,6 +28,7 @@ export default function TaskView() {
         plans={item.plans[0]}
         feedbacks={item.feedbacks[0]}
         checks={item.checks[0]}
+        onDelete={deleteTask}
       />
     </>
   )};
@@ -72,6 +72,14 @@ export default function TaskView() {
         parentId: parentId,
       })
     )
+  }
+
+  const deleteTask = async ({id}: {id: number}) => {
+    const response =  await axios.delete(`http://localhost:3000/api/tasks/${id}`)
+    if(response.status === 200) {
+      const exclusionTaskItems = _.filter(taskItems, taskItem => taskItem.id !== id)
+      setTaskItems(exclusionTaskItems)
+    }
   }
 
   const fetchTasks = async () => {

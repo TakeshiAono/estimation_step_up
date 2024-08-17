@@ -14,7 +14,8 @@ type Props = {
   seconds: number,
   operatingTaskId: number,
   onSelectOperatingTask: () => void,
-  task : Task
+  task : Task,
+  onDelete: (task: Task) => void
 }
 
 const Task = ({
@@ -26,6 +27,7 @@ const Task = ({
   plans,
   feedbacks,
   checks,
+  onDelete,
   // ...aa
 }: Props) => {
   const [title, setTitle] = useState(task.title)
@@ -41,8 +43,6 @@ const Task = ({
   const [type, setType] = useState<number>(task.type)
   const [ticketId, setTicketId] = useState(task.ticketId)
   const [parentId, setParentId] = useState(task.parentId)
-
-
 
   // TODO: ticketsはstoreで状態管理させる
   useEffect(() => {
@@ -136,6 +136,11 @@ const Task = ({
             : <Button variant="contained" color="inherit" onClick={() => {setStatus(Statuses.Run)}}>実施中に戻す</Button>
           )
         }
+        { isEditing && <Button variant="contained" color="error" onClick={() => {onDelete(task)}}>削除</Button>}
+      </div>
+      <div className={styles.taskColumn}>
+        <InputLabel>タイトル</InputLabel>
+        <TextField variant="outlined" disabled={!isEditing} value={title} onChange={(event) => {setTitle(event.target.value)}}/>
       </div>
       <div className={styles.operatedTime}>
         <InputLabel>調査時間</InputLabel>
@@ -169,10 +174,6 @@ const Task = ({
         <Select disabled={!isEditing} className={styles.shortInput} value={type} defaultValue={TaskTypes.FirstTask} onChange={(event) => {setType(event.target.value)}}>
           {_.map(TaskTypes, (value, key)=>(<MenuItem key={key} value={value}>{key}</MenuItem>))}
         </Select>
-      </div>
-      <div className={styles.taskColumn}>
-        <InputLabel>タイトル</InputLabel>
-        <TextField variant="outlined" disabled={!isEditing} value={title} onChange={(event) => {setTitle(event.target.value)}}/>
       </div>
       <div className={styles.taskColumn}>
         <InputLabel>初回完了予想時間</InputLabel>

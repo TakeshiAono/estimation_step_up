@@ -78,13 +78,14 @@ export async function DELETE(_: NextRequest, {params}: {params: Ticket}): Promis
   try {
     const { id } = params
 
-    result = await prisma.ticket.delete({
+    result = await prisma.task.delete({
       where: {
-        id: Number(id),
+        id: Number(id)
       }
     })
     console.log("delete complete")
   } catch(e) {
+    console.log(e)
     status = 400
   } finally {
     return NextResponse.json(result, {status: status});

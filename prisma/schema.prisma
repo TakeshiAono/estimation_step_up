@@ -27,7 +27,7 @@ model Ticket {
 model Task {
   id           Int           @id @default(autoincrement())
   isSurveyTask Boolean       @default(true)
-  ticket       Ticket?       @relation(fields: [ticketId], references: [id])
+  ticket       Ticket?       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   ticketId     Int?          @map("ticket_id")
   status       Int
   type         Int
@@ -46,7 +46,7 @@ model Task {
 model Plan {
   id                            Int       @id @default(autoincrement())
   taskId                        Int       @map("task_id")
-  task                          Task      @relation(fields: [taskId], references: [id])
+  task                          Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   predictionRequiredTimeOfFirst DateTime? @map("prediction_required_time_of_first")
   predictionRequiredTimeOfFinal DateTime? @map("prediction_required_time_of_final")
   predictionSurveyTimeOfFirst   DateTime? @map("prediction_survey_time_of_first")
@@ -60,7 +60,7 @@ model Achievement {
   id            Int       @id @default(autoincrement())
   isDone        Boolean   @default(false)
   taskId        Int       @map("task_id")
-  task          Task      @relation(fields: [taskId], references: [id])
+  task          Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   doneDate      DateTime? @map("done_date")
   surveyTime    Int?      @map("survey_time")
   operatingTime Int?      @map("operating_time")
@@ -72,7 +72,7 @@ model Check {
   id        Int      @id @default(autoincrement())
   taskId    Int      @map("task_id")
   analysis  String?
-  task      Task     @relation(fields: [taskId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }
@@ -82,7 +82,7 @@ model Feedback {
   taskId       Int      @map("task_id")
   issues       String?
   improvements String?
-  task         Task     @relation(fields: [taskId], references: [id])
+  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 }
