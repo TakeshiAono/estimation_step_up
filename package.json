@@ -48,6 +48,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "typescript": "^5",
+    "worker-loader": "^3.0.8",
     "zod-prisma-types": "^3.1.8"
   }
 }

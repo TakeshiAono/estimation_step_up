@@ -12,6 +12,16 @@ const nextConfig = {
       },
     });
 
+    config.module.rules.push({
+      test: /\.\/slow_fib\.worker\.(js|ts)$/,
+      use: {loader: 'worker-loader',
+        options: {
+          name: 'static/[hash].worker.js',
+          publicPath: '/_next/',
+        },
+      }
+    });
+
     return config;
   },
 };
