@@ -130,15 +130,17 @@ const Task = ({
 
   return (
     <div className={styles.taskWraper}  style={isEditing ? {backgroundColor: "white"} : {backgroundColor: "lightgray"}}>
-      <div className={styles.inputBlock} style={{height: "50px"}}>
-        <span style={{marginLeft: "10px"}}>チケット: </span>
-        <Select disabled={!isEditing} value={ticketId} defaultValue={1} onChange={(e) => {setTicketId(e.target.value)}} sx={{height: "40px",width: "500px"}}>
-          {/* TODO: ticketsはstoreで状態管理させる */}
-          {ticketItems.map((ticket)=>{
-            return ticket.status != Statuses.Run && <MenuItem disabled={!isEditing} key={ticket.id} value={ticket.id}>{ticket.title}</MenuItem>
-          })}
-        </Select>
-      </div>
+      {!!task.parentId ||
+        <div className={styles.inputBlock} style={{height: "50px"}}>
+          <span style={{marginLeft: "10px"}}>チケット: </span>
+          <Select disabled={!isEditing} value={ticketId} defaultValue={1} onChange={(e) => {setTicketId(e.target.value)}} sx={{height: "40px",width: "500px"}}>
+            {/* TODO: ticketsはstoreで状態管理させる */}
+            {ticketItems.map((ticket)=>{
+              return ticket.status != Statuses.Done && <MenuItem disabled={!isEditing} key={ticket.id} value={ticket.id}>{ticket.title}</MenuItem>
+            })}
+          </Select>
+        </div>
+      }
       <div style={{display: "flex",justifyContent: "flex-start" ,gap: "5px", margin: "0px 20px"}}>
         {
           isParentTask || (operatingTaskId == task.id
