@@ -3,12 +3,18 @@
   flex-direction: row;
   justify-content: space-around;
   align-items: end;
-  border: solid;
-  padding: 20px 0px;
+  padding: 5px 20px 0px;
   border-radius: 30px;
-  margin: 20px;
   height: 80px;
-  width:max-content
+}
+
+.taskWraper {
+  display: flex;
+  flex-direction: column;
+  border: solid;
+  border-radius: 30px;  margin: 20px;
+  width:max-content;
+  padding: 10px;
 }
 
 .shortInput {
