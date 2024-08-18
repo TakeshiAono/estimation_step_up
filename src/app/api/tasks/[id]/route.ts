@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest, {params}: {params: Ticket}): P
 
   try {
     const { id } = params
-    const { plan, check, feedback, achievement, ...other } = await request.json()
+    const { seconds, plan, check, feedback, achievement, ...other } = await request.json()
     const data = { updatedAt: new Date(), ...other }
     result = await prisma.task.update({
       where: {
