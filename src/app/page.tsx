@@ -42,7 +42,8 @@ export default function TaskView() {
     }
     
     fetchTaskItems().then((data) => {
-      setTaskItems(data)
+      const parentTasks = data.filter(task => task.parentId === null)
+      setTaskItems(parentTasks)
     })
   }, [])
   
@@ -113,8 +114,8 @@ export default function TaskView() {
           renderItem={renderTask}
           onChange={(event) => {
             storeTasks(event.items)
-            setTaskItems(event.items)}
-          }
+            setTaskItems(event.items)
+          }}
           disableCollapse={true}
           disableDrag={false}
           collapsed={isHidden}
