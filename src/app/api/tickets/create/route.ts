@@ -13,11 +13,6 @@ export async function POST(request: NextRequest, {params}: {params: Ticket}): Pr
         url: url,
         title: title,
         status: status,
-        plans: {
-          create: {
-            
-          }
-        }
       }
     })
     console.log("create complete")
