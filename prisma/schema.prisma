@@ -33,9 +33,9 @@ model Task {
   type         Int
   title        String?
   plans        Plan[]
-  parent       Task?         @relation("Subtasks", fields: [parentId], references: [id])
-  subtasks     Task[]        @relation("Subtasks")
+  parent       Task?         @relation("children", fields: [parentId], references: [id])
   parentId     Int?          @map("parent_id")
+  children     Task[]        @relation("children")
   achievements Achievement[]
   checks       Check[]
   feedbacks    Feedback[]
@@ -100,7 +100,7 @@ generator zod {
   // addSelectType                    = false // default is true
   // validateWhereUniqueInput         = true // default is false
   // createOptionalDefaultValuesTypes = true // default is false
-  // createRelationValuesTypes        = true // default is false
+  createRelationValuesTypes        = true // default is false
   // createPartialTypes               = true // default is false
   // useDefaultValidators             = false // default is true
   // coerceDate                       = false // default is true

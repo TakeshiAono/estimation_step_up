@@ -8,7 +8,7 @@ import Nestable from 'react-nestable';
 import { Button } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
-import { Statuses } from "./constants/TaskConstants";
+import { Statuses, TaskTypes } from "./constants/TaskConstants";
 import type { Task } from "@/schema/zod";
 
 export default function TaskView() {
@@ -54,7 +54,7 @@ export default function TaskView() {
     }
 
     try {
-      const { data } = await storeTask({isSurveyTask: false, status: Statuses.NotYet, type: 2, title: "fff"})
+      const { data } = await storeTask({isSurveyTask: false, status: Statuses.NotYet, type: TaskTypes.FirstTask, title: ""})
       setTaskItems([{ ...data, id: nextId, children: [] }, ...taskItems])
     } catch (error) {
       console.log("Error: ", error)
@@ -71,6 +71,12 @@ export default function TaskView() {
         title: title,
         parentId: parentId,
       })
+    )
+  }
+
+  const storeTasks = async (items) => {
+    return await axios.put<Task>(`http://localhost:3000/api/tasks/bulk`,
+      JSON.stringify(items)
     )
   }
 
@@ -102,7 +108,10 @@ export default function TaskView() {
         <Nestable
           items={taskItems}
           renderItem={renderTask}
-          onChange={(event) => {setTaskItems(event.items)}}
+          onChange={(event) => {
+            storeTasks(event.items)
+            setTaskItems(event.items)}
+          }
           disableCollapse={true}
           disableDrag={false}
           collapsed={isHidden}

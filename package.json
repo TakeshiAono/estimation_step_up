@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:type": "npx prisma migrate dev"
   },
   "dependencies": {
     "@date-io/date-fns": "^3.0.0",

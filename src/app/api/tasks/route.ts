@@ -1,8 +1,9 @@
 import { PrismaClient, Task } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+const prisma = new PrismaClient()
+
 export async function GET(request: NextRequest, {params}: {params: Task}): Promise<Promise<unknown>> {
-  const prisma = new PrismaClient()
   let tasks = null
   let status = 200
 
@@ -13,6 +14,48 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
         achievements: true,
         checks: true,
         feedbacks: true,
+        children: {
+          include: {
+            plans: true,
+            achievements: true,
+            checks: true,
+            feedbacks: true,
+            children: {
+              include: {
+                plans: true,
+                achievements: true,
+                checks: true,
+                feedbacks: true,
+                children: {
+                  include: {
+                    plans: true,
+                    achievements: true,
+                    checks: true,
+                    feedbacks: true,
+                    children: {
+                      include: {
+                        plans: true,
+                        achievements: true,
+                        checks: true,
+                        feedbacks: true,
+                        children: {
+                          include: {
+                            plans: true,
+                            achievements: true,
+                            checks: true,
+                            feedbacks: true,
+                            children: {
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     })
 

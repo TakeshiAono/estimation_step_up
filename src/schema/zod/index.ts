@@ -49,6 +49,19 @@ export const TicketSchema = z.object({
 
 export type Ticket = z.infer<typeof TicketSchema>
 
+// TICKET RELATION SCHEMA
+//------------------------------------------------------
+
+export type TicketRelations = {
+  tasks: TaskWithRelations[];
+};
+
+export type TicketWithRelations = z.infer<typeof TicketSchema> & TicketRelations
+
+export const TicketWithRelationsSchema: z.ZodType<TicketWithRelations> = TicketSchema.merge(z.object({
+  tasks: z.lazy(() => TaskWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // TASK SCHEMA
 /////////////////////////////////////////
@@ -66,6 +79,31 @@ export const TaskSchema = z.object({
 })
 
 export type Task = z.infer<typeof TaskSchema>
+
+// TASK RELATION SCHEMA
+//------------------------------------------------------
+
+export type TaskRelations = {
+  ticket?: TicketWithRelations | null;
+  plans: PlanWithRelations[];
+  parent?: TaskWithRelations | null;
+  children: TaskWithRelations[];
+  achievements: AchievementWithRelations[];
+  checks: CheckWithRelations[];
+  feedbacks: FeedbackWithRelations[];
+};
+
+export type TaskWithRelations = z.infer<typeof TaskSchema> & TaskRelations
+
+export const TaskWithRelationsSchema: z.ZodType<TaskWithRelations> = TaskSchema.merge(z.object({
+  ticket: z.lazy(() => TicketWithRelationsSchema).nullable(),
+  plans: z.lazy(() => PlanWithRelationsSchema).array(),
+  parent: z.lazy(() => TaskWithRelationsSchema).nullable(),
+  children: z.lazy(() => TaskWithRelationsSchema).array(),
+  achievements: z.lazy(() => AchievementWithRelationsSchema).array(),
+  checks: z.lazy(() => CheckWithRelationsSchema).array(),
+  feedbacks: z.lazy(() => FeedbackWithRelationsSchema).array(),
+}))
 
 /////////////////////////////////////////
 // PLAN SCHEMA
@@ -85,6 +123,19 @@ export const PlanSchema = z.object({
 
 export type Plan = z.infer<typeof PlanSchema>
 
+// PLAN RELATION SCHEMA
+//------------------------------------------------------
+
+export type PlanRelations = {
+  task: TaskWithRelations;
+};
+
+export type PlanWithRelations = z.infer<typeof PlanSchema> & PlanRelations
+
+export const PlanWithRelationsSchema: z.ZodType<PlanWithRelations> = PlanSchema.merge(z.object({
+  task: z.lazy(() => TaskWithRelationsSchema),
+}))
+
 /////////////////////////////////////////
 // ACHIEVEMENT SCHEMA
 /////////////////////////////////////////
@@ -102,6 +153,19 @@ export const AchievementSchema = z.object({
 
 export type Achievement = z.infer<typeof AchievementSchema>
 
+// ACHIEVEMENT RELATION SCHEMA
+//------------------------------------------------------
+
+export type AchievementRelations = {
+  task: TaskWithRelations;
+};
+
+export type AchievementWithRelations = z.infer<typeof AchievementSchema> & AchievementRelations
+
+export const AchievementWithRelationsSchema: z.ZodType<AchievementWithRelations> = AchievementSchema.merge(z.object({
+  task: z.lazy(() => TaskWithRelationsSchema),
+}))
+
 /////////////////////////////////////////
 // CHECK SCHEMA
 /////////////////////////////////////////
@@ -115,6 +179,19 @@ export const CheckSchema = z.object({
 })
 
 export type Check = z.infer<typeof CheckSchema>
+
+// CHECK RELATION SCHEMA
+//------------------------------------------------------
+
+export type CheckRelations = {
+  task: TaskWithRelations;
+};
+
+export type CheckWithRelations = z.infer<typeof CheckSchema> & CheckRelations
+
+export const CheckWithRelationsSchema: z.ZodType<CheckWithRelations> = CheckSchema.merge(z.object({
+  task: z.lazy(() => TaskWithRelationsSchema),
+}))
 
 /////////////////////////////////////////
 // FEEDBACK SCHEMA
@@ -130,3 +207,16 @@ export const FeedbackSchema = z.object({
 })
 
 export type Feedback = z.infer<typeof FeedbackSchema>
+
+// FEEDBACK RELATION SCHEMA
+//------------------------------------------------------
+
+export type FeedbackRelations = {
+  task: TaskWithRelations;
+};
+
+export type FeedbackWithRelations = z.infer<typeof FeedbackSchema> & FeedbackRelations
+
+export const FeedbackWithRelationsSchema: z.ZodType<FeedbackWithRelations> = FeedbackSchema.merge(z.object({
+  task: z.lazy(() => TaskWithRelationsSchema),
+}))
