@@ -16,6 +16,7 @@ export default function TaskView() {
   const [taskItems, setTaskItems] = useState<Task[]>([])
   const [isHidden, setIsHidden] = useState(false)
   const [operatingTaskId, setOperatingTaskId] = useState(null)
+  const [isMinimum, setIsMinimum] = useState(true)
 
   const renderTask = ({ item }: {item: Task}) => {return (
     <>
@@ -29,6 +30,7 @@ export default function TaskView() {
         feedbacks={item.feedbacks[0]}
         checks={item.checks[0]}
         onDelete={deleteTask}
+        isMinimum={isMinimum}
       />
     </>
   )};
@@ -94,7 +96,8 @@ export default function TaskView() {
 
   return (
     <>
-      <Button variant="contained" color="warning" onClick={() => {console.log("タスク更新")}} style={{marginRight: "20px"}}>タスク更新</Button>
+      <Button variant="contained" color="warning" style={{marginRight: "20px"}}>タスク更新</Button>
+      <Button variant="contained" color="success" style={{marginRight: "20px"}} onClick={() => {setIsMinimum(!isMinimum)}}>{isMinimum ? "タスク最小表示" : "タスク通常表示"}</Button>
       { isHidden
         ? <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク表示</Button>
         : <Button variant="contained" onClick={() => {setIsHidden(!isHidden)}}>下層タスク非表示</Button>
