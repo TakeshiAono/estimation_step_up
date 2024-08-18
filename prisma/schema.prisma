@@ -45,7 +45,7 @@ model Task {
 
 model Plan {
   id                            Int       @id @default(autoincrement())
-  taskId                        Int       @map("task_id")
+  taskId                        Int       @map("task_id") @unique
   task                          Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   predictionRequiredTimeOfFirst DateTime? @map("prediction_required_time_of_first")
   predictionRequiredTimeOfFinal DateTime? @map("prediction_required_time_of_final")
@@ -59,7 +59,7 @@ model Plan {
 model Achievement {
   id            Int       @id @default(autoincrement())
   isDone        Boolean   @default(false)
-  taskId        Int       @map("task_id")
+  taskId        Int       @map("task_id") @unique
   task          Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   doneDate      DateTime? @map("done_date")
   surveyTime    Int?      @map("survey_time")
@@ -70,7 +70,7 @@ model Achievement {
 
 model Check {
   id        Int      @id @default(autoincrement())
-  taskId    Int      @map("task_id")
+  taskId    Int      @map("task_id") @unique
   analysis  String?
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
@@ -79,7 +79,7 @@ model Check {
 
 model Feedback {
   id           Int      @id @default(autoincrement())
-  taskId       Int      @map("task_id")
+  taskId       Int      @map("task_id") @unique
   issues       String?
   improvements String?
   task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)

@@ -28,11 +28,9 @@ const Task = ({
   feedbacks,
   checks,
   onDelete,
-  // ...aa
 }: Props) => {
   const [title, setTitle] = useState(task.title)
   const [isParentTask, setIsParentTask] = useState(false)
-  // console.log("確認", aa)
   const [operatingTime, setOperatingTime] = useState(achievements.operatingTime)
   const [surveyTime, setSurveyTime] = useState(achievements.surveyTime)
   const [isEditing, setIsEditing] = useState(false)
@@ -78,13 +76,32 @@ const Task = ({
     : onSelectOperatingTask(task.id)
   }
 
-  const switchParentTask = () => {
-    setIsParentTask(!isParentTask)
+  useEffect(() => {
+    if(operatingTime % 1200 === 0 ) { //NOTE:20分ごとに自動保存されるようにする。
+      updateTime()
+    }
+  }, [operatingTime])
+
+  useEffect(() => {
+    if(surveyTime % 1200 === 0) { //NOTE:20分ごとに自動保存されるようにする。
+      updateTime()
+    }
+  }, [surveyTime])
+
+  const updateTime = async () => {
+    console.log(surveyTime, operatingTime)
+    return await axios.patch(`http://localhost:3000/api/tasks/${task.id}/time`,
+      {
+        surveyTime: surveyTime,
+        operatingTime: operatingTime,
+      }
+    )
   }
 
   const mutationTask = async () => {
     return await axios.patch(`http://localhost:3000/api/tasks/${task.id}`,
       {
+        seconds: seconds,
         isSurveyTask: isSurveyTask,
         status: status,
         type: type,
