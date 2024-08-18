@@ -1,8 +1,9 @@
 import { PrismaClient, Ticket } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+const prisma = new PrismaClient()
+
 export async function GET( _: any, {params}: {params: {id: string}}): Promise<Promise<unknown>> {
-  const prisma = new PrismaClient()
   const ticket = await prisma.ticket.findMany({
     where: {
       id: Number(params.id)
@@ -13,7 +14,6 @@ export async function GET( _: any, {params}: {params: {id: string}}): Promise<Pr
 }
 
 export async function PUT(request: NextRequest, {params}: {params: Ticket}): Promise<Promise<unknown>> {
-  const prisma = new PrismaClient()
   let result = null
   let status = 200
 
@@ -36,7 +36,6 @@ export async function PUT(request: NextRequest, {params}: {params: Ticket}): Pro
 }
 
 export async function PATCH(request: NextRequest, {params}: {params: Ticket}): Promise<Promise<unknown>> {
-  const prisma = new PrismaClient()
   // FIXME: curl -X PUT -H "Content-Type: application/json" -d '{"title":"タイトル"}' 'http://localhost:3000/api/tickets/2'
   let result = null
   let status = 200
@@ -71,7 +70,6 @@ export async function PATCH(request: NextRequest, {params}: {params: Ticket}): P
 }
 
 export async function DELETE(_: NextRequest, {params}: {params: Ticket}): Promise<Promise<unknown>> {
-  const prisma = new PrismaClient()
   let result = null
   let status = 200
 
