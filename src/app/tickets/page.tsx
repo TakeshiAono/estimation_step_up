@@ -36,7 +36,7 @@ export default function TicketView() {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      const {data} = await axios.get("http://localhost:3000/api/tickets")
+      const {data} = await axios.get("http://localhost:3001/api/tickets")
       console.log(data)
       return data.sort((item) => item.id).reverse()
     }
@@ -95,7 +95,7 @@ export default function TicketView() {
     }
 
     try {
-      await axios.post(`http://localhost:3000/api/tickets/create`, JSON.stringify({title: title, status: TicketStatuses[status], url: url}))
+      await axios.post(`http://localhost:3001/api/tickets/create`, JSON.stringify({title: title, status: TicketStatuses[status], url: url}))
       const newItem = createData(nextId.toString(), TicketStatuses[status], title, url, 0, 0)
       setTicketItems([ newItem, ...ticketItems])
     } catch (e) {
