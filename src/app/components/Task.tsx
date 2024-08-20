@@ -321,15 +321,13 @@ const Task = ({
         <div className={styles.operatedTime}>
           <InputLabel>調査時間</InputLabel>
           <p style={{ fontSize: "30px", alignItems: "center", margin: "0px" }}>
-            {Math.floor(surveyTime / 3600)}:{Math.floor(surveyTime / 60)}:
-            {surveyTime % 60}
+            {Math.floor(surveyTime / 3600)}:{Math.floor(surveyTime / 60 % 60)}:{surveyTime % 60}
           </p>
         </div>
         <div className={styles.operatedTime}>
           <InputLabel>実働時間</InputLabel>
           <p style={{ fontSize: "30px", alignItems: "center", margin: "0px" }}>
-            {Math.floor(operatingTime / 3600)}:{Math.floor(operatingTime / 60)}:
-            {operatingTime % 60}
+            {Math.floor(operatingTime / 3600)}:{Math.floor(operatingTime / 60 % 60)}:{operatingTime % 60}
           </p>
         </div>
         <div className={styles.inputBlock}>
