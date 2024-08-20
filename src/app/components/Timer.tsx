@@ -3,6 +3,7 @@ import useSound from "use-sound";
 import { Button, InputLabel, Slider, Stack, TextField } from "@mui/material";
 // @ts-ignore
 import operationEndSound from "./../assets/operation_end.mp3";
+import notifySound from "./../assets/notify.mp3";
 // @ts-ignore
 import restEndSound from "./../assets/rest_end.mp3";
 import styles from "../css/Timer.module.css";
@@ -17,17 +18,24 @@ const Timer = ({
 }: {
   onTimerUpdate: (number: number) => void;
 }) => {
+  const timer = useRef<any>(null)
+  const isInitialRender = useRef(true)
   const [operatingSeconds, setOperatingSeconds] = useState<number>(25 * 60);
   const [restSeconds, setRestSeconds] = useState<number>(5 * 60);
   const [isResting, setIsResting] = useState(false);
   const [volume, setVolume] = useState(50)
   const [operationSoundPlay] = useSound(operationEndSound, { volume: volume / 100 });
   const [restSoundPlay] = useSound(restEndSound, { volume: volume / 100 });
+  const [notifySoundPlay] = useSound(notifySound, { volume: volume / 100 });
   const [isInputHidden, setIsInputHidden] = useState(false);
   const [sumTime, setSumTime] = useState(0);
   const [isStarting, setIsStarting] = useState(false);
   const [inputOperatingMinutes, setInputOperatingMinutes] = useState(25);
   const [inputRestMinutes, setInputRestMinutes] = useState(5);
+
+  useEffect(() => {
+    isInitialRender.current = false
+  }, [])
 
   useEffect(() => {
     isResting || onTimerUpdate(sumTime);
@@ -41,6 +49,16 @@ const Timer = ({
       timerReset();
     }
   }, [sumTime]);
+
+  useEffect(() => {
+    if(!isStarting && sumTime !== 0) {
+      timer.current = setInterval(() => {
+        notifySoundPlay()
+      }, 20000);
+    } else {
+      clearInterval(timer.current)
+    }
+  }, [isStarting])
 
   const addSum = useRef(() => {
     setSumTime((prevSumTime) => {
