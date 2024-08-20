@@ -33,6 +33,7 @@ export default function TaskView() {
           checks={item.checks[0]}
           onDelete={deleteTask}
           isMinimum={isMinimum}
+          onAddTask={addTask}
         />
       </>
     );
@@ -71,6 +72,51 @@ export default function TaskView() {
     } catch (error) {
       console.log("Error: ", error);
     }
+  };
+
+  const addTask = async (addToTaskId: number) => {
+    const { data } = await axios.post(`http://localhost:3001/api/tasks/create/child/${addToTaskId}`,)
+    const positions = _getTargetTaskPositionBFS(taskItems, addToTaskId);
+    positions.reduce((accumulator, currentValue, index) => {
+      if (index == positions.length -1) {
+        accumulator[currentValue].children.unshift(data)
+        setTaskItems([...taskItems]);
+        return;
+      }
+
+      return accumulator[currentValue].children;
+    }, taskItems);
+  };
+
+  const _getTargetTaskPositionBFS = (
+    taskItems: Task[],
+    taskId: number
+  ): number[] => {
+    let originNodeAndPosition: [Task, number[]] = [];
+    let nextNodeAndPosition: [Task, number[]] = [];
+
+    originNodeAndPosition = taskItems.map((item, index) => [item, [index]]);
+    let catchNodePosition = null;
+
+    while (originNodeAndPosition.length > 0) {
+      catchNodePosition = originNodeAndPosition.find(
+        (nodeInfo) => nodeInfo[0].id == taskId
+      )?.[1]; // 検索実行
+      if (catchNodePosition) break; // 検索引っかかったらwhileを抜ける
+
+      // キューから出して別の配列に保存
+      while (originNodeAndPosition.length > 0) {
+        const target = originNodeAndPosition.shift();
+        const tasks = target[0].children;
+        tasks.forEach((task, index) => {
+          nextNodeAndPosition.push([task, [...target[1], index]]);
+        });
+      }
+
+      originNodeAndPosition = nextNodeAndPosition;
+      nextNodeAndPosition = [];
+    }
+    return catchNodePosition;
   };
 
   const storeTask = async ({

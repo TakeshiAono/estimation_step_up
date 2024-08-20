@@ -27,6 +27,7 @@ type Props = {
   task: Task;
   onDelete: (task: Task) => void;
   isMinimum: boolean;
+  onAddTask: (id: number) => void;
 };
 
 const Task = ({
@@ -40,6 +41,7 @@ const Task = ({
   checks,
   onDelete,
   isMinimum,
+  onAddTask,
 }: Props) => {
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
@@ -205,45 +207,61 @@ const Task = ({
           margin: "0px 20px",
         }}
       >
-        {isParentTask ||
-          (operatingTaskId == task.id ? (
+        <div>
+          {isParentTask ||
+            (operatingTaskId == task.id ? (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={switchOperatingTask}
+              >
+                作業終了
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="success"
+                onClick={switchOperatingTask}
+              >
+                作業開始
+              </Button>
+            ))
+          }
+        </div>
+        <div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              onAddTask(task.id)
+            }}
+          >
+            子タスク追加
+          </Button>
+        </div>
+        <div>
+          {isEditing ? (
             <Button
               variant="contained"
-              color="error"
-              onClick={switchOperatingTask}
+              color="info"
+              onClick={() => {
+                setIsEditing(!isEditing);
+              }}
             >
-              作業終了
+              編集完了
             </Button>
           ) : (
             <Button
               variant="contained"
-              color="success"
-              onClick={switchOperatingTask}
+              color="secondary"
+              onClick={() => {
+                setIsEditing(!isEditing);
+              }}
             >
-              作業開始
+              編集
             </Button>
-          ))}
-        {isEditing ? (
-          <Button
-            variant="contained"
-            color="info"
-            onClick={() => {
-              setIsEditing(!isEditing);
-            }}
-          >
-            編集完了
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              setIsEditing(!isEditing);
-            }}
-          >
-            編集
-          </Button>
-        )}
+          )}
+        </div>
         <div style={{ marginLeft: "20px" }}>
           {isEditing &&
             (status != Statuses.Done ? (
