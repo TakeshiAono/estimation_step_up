@@ -11,7 +11,7 @@ import { VirtualWindow } from "@react-libraries/virtual-window";
 import VolumeDownIcon from '@mui/icons-material/VolumeDown';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
-var worker = new Worker(new URL("../../libs/secondsTimer.ts", import.meta.url));
+let worker = new Worker(new URL("../../libs/secondsTimer.ts", import.meta.url));
 
 const Timer = ({
   onTimerUpdate,
@@ -20,21 +20,24 @@ const Timer = ({
 }) => {
   const timer = useRef<any>(null)
   const isInitialRender = useRef(true)
-  const [operatingSeconds, setOperatingSeconds] = useState<number>(25 * 60);
-  const [restSeconds, setRestSeconds] = useState<number>(5 * 60);
-  const [isResting, setIsResting] = useState(false);
-  const [volume, setVolume] = useState(50)
+  const initializeOperatingSeconds = 25
+  const initializeRestSeconds = 5
+  const [operatingSeconds, setOperatingSeconds] = useState<number>((Number(localStorage.getItem("inputOperatingMinutes")) || initializeOperatingSeconds) * 60 - (localStorage.getItem("isResting") === "true"  ? 0 : Number(localStorage.getItem("sumTime"))));
+  const [restSeconds, setRestSeconds] = useState<number>(Number((localStorage.getItem("inputRestMinutes")) || initializeRestSeconds) * 60 - (localStorage.getItem("isResting") === "true"  ? Number(localStorage.getItem("sumTime")) : 0));
+  const [isResting, setIsResting] = useState(localStorage.getItem("isResting") === "true");
+  const [volume, setVolume] = useState(Number(localStorage.getItem("volume")) || 50)
   const [operationSoundPlay] = useSound(operationEndSound, { volume: volume / 100 });
   const [restSoundPlay] = useSound(restEndSound, { volume: volume / 100 });
   const [notifySoundPlay] = useSound(notifySound, { volume: volume / 100 });
   const [isInputHidden, setIsInputHidden] = useState(false);
-  const [sumTime, setSumTime] = useState(0);
-  const [isStarting, setIsStarting] = useState(false);
-  const [inputOperatingMinutes, setInputOperatingMinutes] = useState(25);
-  const [inputRestMinutes, setInputRestMinutes] = useState(5);
+  const [sumTime, setSumTime] = useState(Number(localStorage.getItem("sumTime")));
+  const [isStarting, setIsStarting] = useState(localStorage.getItem("isStarting") === "true");
+  const [inputOperatingMinutes, setInputOperatingMinutes] = useState(Number(localStorage.getItem("inputOperatingMinutes")) || initializeOperatingSeconds);
+  const [inputRestMinutes, setInputRestMinutes] = useState(Number(localStorage.getItem("inputRestMinutes")) || initializeRestSeconds);
 
   useEffect(() => {
     isInitialRender.current = false
+    if (isStarting) {worker.postMessage("start")}
   }, [])
 
   useEffect(() => {
@@ -58,7 +61,21 @@ const Timer = ({
     } else {
       clearInterval(timer.current)
     }
+    worker.postMessage(["stop", sumTime]);
+    localStorage.setItem("isStarting", `${isStarting}`);
   }, [isStarting])
+
+  useEffect(() => {
+    localStorage.setItem("volume", volume.toString())
+  }, [volume])
+
+  useEffect(() => {
+    localStorage.setItem("inputOperatingMinutes", inputOperatingMinutes.toString())
+  }, [inputOperatingMinutes])
+
+  useEffect(() => {
+    localStorage.setItem("inputRestMinutes", inputRestMinutes.toString())
+  }, [inputRestMinutes])
 
   const addSum = useRef(() => {
     setSumTime((prevSumTime) => {
@@ -68,13 +85,14 @@ const Timer = ({
   });
 
   worker.onmessage = (e) => {
-    addSum.current();
+    localStorage.setItem("sumTime", Number(sumTime));
+    addSum.current(e.data);
   };
 
   const timerStart = async () => {
     if (!isStarting) {
-      setIsStarting(true);
       worker.postMessage("start");
+      setIsStarting(true);
     }
   };
 
@@ -85,6 +103,7 @@ const Timer = ({
 
   const timerReset = () => {
     timerPause();
+    setSumTime(0)
     setTimeout(() => {
       setOperatingSeconds(inputOperatingMinutes * 60);
       setRestSeconds(inputRestMinutes * 60);
@@ -93,6 +112,7 @@ const Timer = ({
 
   const timerSwitch = () => {
     timerReset();
+    localStorage.setItem("isResting", `${!isResting}`);
     setIsResting(!isResting);
   };
 

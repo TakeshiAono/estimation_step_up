@@ -3,7 +3,6 @@ let i = 0;
 
 self.onmessage = ({ data }) => {
   if (data === "start") {
-    // intervalが既に存在する場合は、セットしないようにする
     if (!interval) {
       interval = setInterval(() => {
         i++;
@@ -14,7 +13,7 @@ self.onmessage = ({ data }) => {
     if (interval) {
       clearInterval(interval); // インターバルを停止
       interval = undefined; // intervalをリセット
-      postMessage("Stopped");
+      postMessage(0);
     }
   }
 };
