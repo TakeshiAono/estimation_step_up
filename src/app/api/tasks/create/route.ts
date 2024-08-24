@@ -30,7 +30,49 @@ export async function POST(request: NextRequest, {params}: {params: Task}): Prom
         plans: true,
         achievements: true,
         checks: true,
-        feedbacks: true
+        feedbacks: true,
+        children: {
+          include: {
+            plans: true,
+            achievements: true,
+            checks: true,
+            feedbacks: true,
+            children: {
+              include: {
+                plans: true,
+                achievements: true,
+                checks: true,
+                feedbacks: true,
+                children: {
+                  include: {
+                    plans: true,
+                    achievements: true,
+                    checks: true,
+                    feedbacks: true,
+                    children: {
+                      include: {
+                        plans: true,
+                        achievements: true,
+                        checks: true,
+                        feedbacks: true,
+                        children: {
+                          include: {
+                            plans: true,
+                            achievements: true,
+                            checks: true,
+                            feedbacks: true,
+                            children: {
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     })
     console.log("create complete")

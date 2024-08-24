@@ -4,6 +4,7 @@ import {
   FormControl,
   InputAdornment,
   InputLabel,
+  Link,
   MenuItem,
   OutlinedInput,
   Select,
@@ -19,6 +20,7 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Statuses, TaskTypes } from "@/app/constants/TaskConstants";
 import type { Task } from "@/schema/zod";
+import TaskModal from "./TaskModal";
 
 type Props = {
   seconds: number;
@@ -28,7 +30,17 @@ type Props = {
   onDelete: (task: Task) => void;
   isMinimum: boolean;
   onAddTask: (id: number) => void;
+  onAddTasks: (id: number, taskTitles: string[]) => void;
+  onModalOpen: (isModalOpen: boolean) => void;
+  onSelectedModalItem: (taskItem: any) => void
+  createFlg: boolean;
 };
+
+type TaskItem = {
+  id: number;
+  title: string;
+  hour: number;
+}
 
 const Task = ({
   seconds,
@@ -42,6 +54,10 @@ const Task = ({
   onDelete,
   isMinimum,
   onAddTask,
+  onModalOpen,
+  onSelectedModalItem,
+  createFlg,
+  onAddTasks
 }: Props) => {
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
@@ -57,8 +73,6 @@ const Task = ({
   const [type, setType] = useState<number>(task.type);
   const [ticketId, setTicketId] = useState(task.ticketId);
   const [parentId, setParentId] = useState(task.parentId);
-  // console.log("たす", task.plans[0]);
-  // console.log("たす2", task.plans[0].predictionRequiredTimeOfFirst);
   const [predictionSurveyTimeOfFirst, setPredictionSurveyTimeOfFirst] =
     useState(task.plans[0].predictionSurveyTimeOfFirst);
   const [predictionRequiredTimeOfFinal, setPredictionRequiredTimeOfFinal] =
@@ -68,6 +82,10 @@ const Task = ({
   const [predictionSurveyTimeOfFinal, setPredictionSurveyTimeOfFinal] =
     useState(task.plans[0].predictionSurveyTimeOfFinal);
   const [surveyDetail, setSurveyDetail] = useState(task.plans[0].surveyDetail);
+  const [isSelectToAddTask, setIsSelectToAddTask] = useState(false)
+  const [childrenTaskTitles, setChildrenTaskTitles] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskItems, setTaskItems] = useState<TaskItem[]>([{id: 0, title: "", hour: 0}]);
 
   // TODO: ticketsはstoreで状態管理させる
   useEffect(() => {
@@ -99,6 +117,11 @@ const Task = ({
     }
   }, [seconds]);
 
+  useEffect(() => {
+    if(createFlg && isSelectToAddTask) {
+    }
+  }, [createFlg]);
+
   const switchOperatingTask = () => {
     operatingTaskId == task.id
       ? onSelectOperatingTask(null)
@@ -120,7 +143,6 @@ const Task = ({
   }, [surveyTime]);
 
   const updateTime = async () => {
-    console.log(surveyTime, operatingTime);
     return await axios.patch(
       `http://localhost:3001/api/tasks/${task.id}/time`,
       {
@@ -207,6 +229,13 @@ const Task = ({
           margin: "0px 20px",
         }}
       >
+        <Link
+        target={"_blank"}
+        style={{ display: "inline-block", marginLeft: "30px" }}
+        href={`/tasks/${task.id}`}
+        >
+          タスクNo.{task.id}
+        </Link>
         <div>
           {isParentTask ||
             (operatingTaskId == task.id ? (
@@ -228,17 +257,15 @@ const Task = ({
             ))
           }
         </div>
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              onAddTask(task.id)
-            }}
-          >
-            子タスク追加
-          </Button>
-        </div>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            setIsModalOpen(true)
+          }}
+        >
+          子タスク追加
+        </Button>
         <div>
           {isEditing ? (
             <Button
@@ -285,19 +312,18 @@ const Task = ({
                 実施中に戻す
               </Button>
             ))}
-          {isEditing ||
-            (!task.title && (
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => {
-                  onDelete(task);
-                }}
-                sx={{ marginLeft: "10px" }}
-              >
-                削除
-              </Button>
-            ))}
+          {
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                onDelete(task);
+              }}
+              sx={{ marginLeft: "10px" }}
+            >
+              削除
+            </Button>
+          }
         </div>
       </div>
       <div className={styles.task}>
@@ -487,6 +513,93 @@ const Task = ({
           </>
         )}
       </div>
+      <TaskModal
+        onSuccess={() => {onAddTasks(task.id, taskItems)}}
+        isOpen={isModalOpen}
+        onCloseModal={() => {setIsModalOpen(false)}}
+      >
+
+        <FormControl variant={"filled"} sx={{
+          mt: 2,
+          minWidth: 120,
+          justifyContent: "flex-start",
+          gap: 5, // 子要素間にスペースを持たせる
+          width: "100%"
+        }}>
+          <div>
+            <span>タイトル: </span>
+            {task.title}
+          </div>
+          <div>
+            <Button 
+              variant="contained"
+              color="warning"
+              onClick={() => {
+                if(taskItems.length > 0) {
+                  const maxId = _.maxBy(taskItems, "id").id
+                  setTaskItems([...taskItems, {id: maxId + 1, title:"", hour: 0}])
+                } else {
+                  setTaskItems([{id: 0, title:"", hour: 0}])
+                }
+              }}
+            >
+              行追加
+            </Button>
+          </div>
+          {
+            taskItems.map((taskItem, index) =>
+              <div key={index} style={{display: "flex"}}>
+                <TextField
+                  label="タイトル"
+                  variant="outlined"
+                  value={taskItem.title}
+                  onChange={(e) => {
+                    console.log(e.target.value)
+                    setTaskItems(
+                      taskItems.map((item) => {
+                        if(item.id == taskItem.id) {
+                          return {id: index, title: e.target.value, hour: taskItem.hour}
+                        } else {
+                          return item
+                        }
+                      })
+                    )
+                  }}
+                />
+                <TextField
+                  label="完了予測時間"
+                  variant="outlined"
+                  type="number"
+                  sx={{marginLeft: "50px"}}
+                  value={taskItem.hour}
+                  onChange={(e) => {
+                    setTaskItems(
+                      taskItems.map((item) => {
+                        if(item.id == taskItem.id) {
+                          return {id: index, title: taskItem.title, hour: e.target.value}
+                        } else {
+                          return item
+                        }
+                      }
+                    ))}}
+                />
+                <Button
+                  sx={{marginLeft: "30px"}}
+                  variant="contained"
+                  color="error"
+                  onClick={() => {
+                    setTaskItems(
+                      taskItems.filter((item) => taskItem.id != item.id)
+                    )
+                  }}>
+                    削除
+                </Button>
+              </div>
+            )
+          }
+          {JSON.stringify(taskItems)}
+        </FormControl>
+      </TaskModal>
     </div>
   );
 };

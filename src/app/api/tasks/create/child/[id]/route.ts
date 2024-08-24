@@ -32,7 +32,49 @@ export async function POST(
         plans: true,
         achievements: true,
         checks: true,
-        feedbacks: true
+        feedbacks: true,
+        children: {
+          include: {
+            plans: true,
+            achievements: true,
+            checks: true,
+            feedbacks: true,
+            children: {
+              include: {
+                plans: true,
+                achievements: true,
+                checks: true,
+                feedbacks: true,
+                children: {
+                  include: {
+                    plans: true,
+                    achievements: true,
+                    checks: true,
+                    feedbacks: true,
+                    children: {
+                      include: {
+                        plans: true,
+                        achievements: true,
+                        checks: true,
+                        feedbacks: true,
+                        children: {
+                          include: {
+                            plans: true,
+                            achievements: true,
+                            checks: true,
+                            feedbacks: true,
+                            children: {
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     });
     console.log("create child complete");

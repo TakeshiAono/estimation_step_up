@@ -7,10 +7,58 @@ export async function GET(
   _: any,
   { params }: { params: { id: string } }
 ): Promise<Promise<unknown>> {
-  const ticket = await prisma.ticket.findMany({
+  const ticket = await prisma.task.findMany({
     where: {
       id: Number(params.id),
     },
+    include: {
+      plans: true,
+      achievements: true,
+      checks: true,
+      feedbacks: true,
+      children: {
+        include: {
+          plans: true,
+          achievements: true,
+          checks: true,
+          feedbacks: true,
+          children: {
+            include: {
+              plans: true,
+              achievements: true,
+              checks: true,
+              feedbacks: true,
+              children: {
+                include: {
+                  plans: true,
+                  achievements: true,
+                  checks: true,
+                  feedbacks: true,
+                  children: {
+                    include: {
+                      plans: true,
+                      achievements: true,
+                      checks: true,
+                      feedbacks: true,
+                      children: {
+                        include: {
+                          plans: true,
+                          achievements: true,
+                          checks: true,
+                          feedbacks: true,
+                          children: {
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   });
 
   return NextResponse.json(ticket);

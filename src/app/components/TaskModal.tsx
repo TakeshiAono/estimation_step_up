@@ -1,7 +1,7 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, TextField } from "@mui/material"
 import { useEffect, useState } from "react";
 
-const Modal = ({onSuccess, isOpen, onCloseModal, children}) => {
+const TaskModal = ({onSuccess, isOpen, onCloseModal, children}) => {
 
   const [open, setOpen] = useState(false);
   const [fullWidth, setFullWidth] = useState(true);
@@ -26,10 +26,10 @@ return (
       open={open}
       onClose={onCloseModal}
     >
-      <DialogTitle>チケット新規作成</DialogTitle>
+      <DialogTitle>タスク新規作成</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          作成するチケットの情報を入力してください
+          作成するタスクの情報を入力してください
         </DialogContentText>
         {children}
       </DialogContent>
@@ -54,4 +54,4 @@ return (
   )
 }
 
-export default Modal
+export default TaskModal

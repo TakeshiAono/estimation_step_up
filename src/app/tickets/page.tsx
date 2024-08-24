@@ -18,7 +18,7 @@ import {
   TextField,
 } from "@mui/material";
 import Link from "next/link";
-import Modal from "../components/Modal";
+import TicketModal from "../components/TicketModal";
 import axios from "axios";
 
 export default function TicketView() {
@@ -174,7 +174,7 @@ export default function TicketView() {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
 
-      <Modal onSuccess={createTicket} isOpen={isModalOpen} onCloseModal={closeModal}>
+      <TicketModal onSuccess={createTicket} isOpen={isModalOpen} onCloseModal={closeModal}>
         <FormControl variant={"filled"} sx={{
           mt: 2,
           minWidth: 120,
@@ -198,7 +198,7 @@ export default function TicketView() {
           </FormControl>
           <TextField label="URL" variant="outlined" onChange={(e) => {setUrl(e.target.value)}}/>
         </FormControl>
-      </Modal>
+      </TicketModal>
     </>
   );
 }
