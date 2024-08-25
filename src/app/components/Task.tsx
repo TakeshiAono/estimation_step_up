@@ -586,7 +586,6 @@ const Task = ({
               </div>
             )
           }
-          {JSON.stringify(taskItems)}
         </FormControl>
       </TaskModal>
     </div>
