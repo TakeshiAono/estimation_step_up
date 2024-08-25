@@ -101,7 +101,7 @@ const TaskMenu = (
           style={{ display: "inline-block", marginLeft: "30px" }}
           href="/tasks"
         >
-        <p>タスク一覧へ</p>
+          <p>タスク一覧へ</p>
         </Link>
     }
   </>

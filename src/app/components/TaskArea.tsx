@@ -46,19 +46,31 @@ export default function TaskArea({
   }, []);
 
   useEffect(() => {
-    fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
-      console.log("取得データ", response.data);
-      const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
-      setTaskItems(parentTasks);
-    });
+    // TODO: パスパラメータがある時とない時のifが複数箇所に記載されているため別フックまたはコンポーネントにまとめる
+    if(!pathParameterTaskId) {
+      fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
+        console.log("取得データ", response.data);
+        const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
+        setTaskItems(parentTasks);
+      });
+    } else {
+      fetchChildTask(pathParameterTaskId).then((response: TaskType[]) => {
+        console.log("取得データA", response.data);
+        const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
+        setTaskItems(parentTasks);
+      });
+    }
   }, []);
 
   useEffect(() => {
-    fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
-      console.log("取得データ", response.data);
-      const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
-      setTaskItems(parentTasks);
-    });
+    // TODO: パスパラメータがある時とない時のifが複数箇所に記載されているため別フックまたはコンポーネントにまとめる
+    if(!pathParameterTaskId) {
+      fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
+        console.log("取得データ", response.data);
+        const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
+        setTaskItems(parentTasks);
+      });
+    }
   }, [selectSearchTicketId])
 
   const filterTaskItemByTicketId = () => {
@@ -189,41 +201,45 @@ export default function TaskArea({
 
   return (
     <>
-      <div style={{marginTop: "30px"}}>
-        <FormControl sx={{width: "200px"}}>
-          <InputLabel id="search-tickets-label">チケット検索</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            defaultValue={selectSearchTicketId　|| "unclassified"}
-            label="ticket"
-            onChange={(e) => {
-              localStorage.setItem("selectSearchTicketId", e.target.value)
-              setSelectSearchTicketId(e.target.value)
-            }}
-          >
-            <MenuItem
-              key={null}
-              value={"unclassified"}
-            >
-              未分類
-            </MenuItem>
-            {/* TODO: ticketsはstoreで状態管理させる */}
-            {ticketItems.map((ticket) => {
-              return (
-                ticket.status != Statuses.Done && (
-                  <MenuItem
-                    key={ticket.id}
-                    value={ticket.id}
-                  >
-                    {ticket.title}
-                  </MenuItem>
-                )
-              );
-            })}
-          </Select>
-        </FormControl>
-      </div>
+      { !!pathParameterTaskId ||
+        <div style={{marginTop: "30px"}}>
+          <FormControl sx={{width: "200px"}}>
+            <InputLabel id="search-tickets-label">チケット検索</InputLabel>
+              
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  defaultValue={selectSearchTicketId　|| "unclassified"}
+                  label="ticket"
+                  onChange={(e) => {
+                    localStorage.setItem("selectSearchTicketId", e.target.value)
+                    setSelectSearchTicketId(e.target.value)
+                  }}
+                >
+              
+              <MenuItem
+                key={null}
+                value={"unclassified"}
+              >
+                未分類
+              </MenuItem>
+              {/* TODO: ticketsはstoreで状態管理させる */}
+              {ticketItems.map((ticket) => {
+                return (
+                  ticket.status != Statuses.Done && (
+                    <MenuItem
+                      key={ticket.id}
+                      value={ticket.id}
+                    >
+                      {ticket.title}
+                    </MenuItem>
+                  )
+                );
+              })}
+            </Select>
+          </FormControl>
+        </div>
+      }
       {taskItems && (
         <Nestable
           items={taskItems}
