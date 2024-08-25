@@ -40,6 +40,7 @@ type TaskItem = {
   id: number;
   title: string;
   hour: number;
+  ticketItems: any[];
 }
 
 const Task = ({
@@ -57,7 +58,8 @@ const Task = ({
   onModalOpen,
   onSelectedModalItem,
   createFlg,
-  onAddTasks
+  onAddTasks,
+  ticketItems
 }: Props) => {
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
@@ -66,7 +68,7 @@ const Task = ({
   );
   const [surveyTime, setSurveyTime] = useState(achievements.surveyTime);
   const [isEditing, setIsEditing] = useState(false);
-  const [ticketItems, setTicketItems] = useState<any>([]);
+  // const [ticketItems, setTicketItems] = useState<any>([]);
   const [status, setStatus] = useState(task.status);
   const [runState, setRunState] = useState("survey");
   const [isSurveyTask, setIsSurveyTask] = useState<boolean>(task.isSurveyTask);
@@ -86,18 +88,6 @@ const Task = ({
   const [childrenTaskTitles, setChildrenTaskTitles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskItems, setTaskItems] = useState<TaskItem[]>([{id: 0, title: "", hour: 0}]);
-
-  // TODO: ticketsはstoreで状態管理させる
-  useEffect(() => {
-    const fetchTickets = async () => {
-      const { data } = await axios.get("http://localhost:3001/api/tickets");
-      console.log(data);
-      return data.sort((item) => item.id).reverse();
-    };
-    fetchTickets().then((reuslt) => {
-      setTicketItems(reuslt);
-    });
-  }, []);
 
   useEffect(() => {
     if (!isEditing) mutationTask(); //編集が完了した瞬間にmutationする

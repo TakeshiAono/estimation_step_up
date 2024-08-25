@@ -7,6 +7,8 @@ import Nestable from "react-nestable";
 import axios from "axios";
 import type { Task as TaskType } from "@/schema/zod";
 import Timer from "./Timer";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Statuses } from "../constants/TaskConstants";
 
 type Props = {
   createdTopTask: Task;
@@ -23,6 +25,45 @@ export default function TaskArea({
   const [taskItems, setTaskItems] = useState<TaskType[]>([]);
   const [isHidden, setIsHidden] = useState(false);
   const [operatingTaskId, setOperatingTaskId] = useState(null);
+  const [ticketItems, setTicketItems] = useState<any>([]);
+  const [selectSearchTicketId, setSelectSearchTicketId] = useState<number | null>(localStorage.getItem("selectSearchTicketId"))
+
+  // TODO: ticketsはstoreで状態管理させる
+  useEffect(() => {
+    const fetchTickets = async () => {
+      const { data } = await axios.get("http://localhost:3001/api/tickets");
+      console.log(data);
+      return data.sort((item) => item.id).reverse();
+    };
+
+    fetchTickets().then((reuslt) => {
+      setTicketItems(
+        () => {
+          return reuslt
+        }
+      );
+    });
+  }, []);
+
+  useEffect(() => {
+    fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
+      console.log("取得データ", response.data);
+      const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
+      setTaskItems(parentTasks);
+    });
+  }, []);
+
+  useEffect(() => {
+    fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
+      console.log("取得データ", response.data);
+      const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
+      setTaskItems(parentTasks);
+    });
+  }, [selectSearchTicketId])
+
+  const filterTaskItemByTicketId = () => {
+    return taskItems.filter(taskItem => taskItem.ticketId === selectSearchTicketId)
+  }
 
   const renderTask = ({ item }: { item: Task }) => {
     return (
@@ -41,23 +82,17 @@ export default function TaskArea({
           isMinimum={isMinimum}
           onAddTask={addTask}
           onAddTasks={addTasks}
+          ticketItems={ticketItems}
         />
       </>
     );
   };
 
-  useEffect(() => {
-    const fetchTaskItems = async () => {
-      const { data } = pathParameterTaskId ? await fetchChildTask(pathParameterTaskId) : await fetchTasks()
-      return data;
-    };
+  const fetchTasksByTicketId = async (ticketId: number) => {
+    return await axios.get(`http://localhost:3001/api/tasks?ticketId=${ticketId}`);
+  };
 
-    fetchTaskItems().then((data: TaskType[]) => {
-      console.log("取得データ", data);
-      const parentTasks = pathParameterTaskId ? data : data.filter((task) => task.parentId === null)
-      setTaskItems(parentTasks);
-    });
-  }, []);
+
 
   useEffect(() => {
     createdTopTask && setTaskItems([createdTopTask, ...taskItems]);
@@ -79,7 +114,6 @@ export default function TaskArea({
 
   const addTasks = async (addToTaskId: number, taskTitles: string[]) => {
     const { data } = await axios.post(`http://localhost:3001/api/tasks/${addToTaskId}/children/bulk`, taskTitles)
-    console.log("かえってきた", data)
     const positions = _getTargetTaskPositionBFS(taskItems, addToTaskId);
     data.forEach((task: Task) => {
       positions.reduce((accumulator, currentValue, index) => {
@@ -145,7 +179,7 @@ export default function TaskArea({
     }
   };
 
-  const fetchTasks = async () => {
+  const fetchAllTasks = async () => {
     return await axios.get(`http://localhost:3001/api/tasks`);
   };
 
@@ -155,6 +189,41 @@ export default function TaskArea({
 
   return (
     <>
+      <div style={{marginTop: "30px"}}>
+        <FormControl sx={{width: "200px"}}>
+          <InputLabel id="search-tickets-label">チケット検索</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            defaultValue={selectSearchTicketId　|| "unclassified"}
+            label="ticket"
+            onChange={(e) => {
+              localStorage.setItem("selectSearchTicketId", e.target.value)
+              setSelectSearchTicketId(e.target.value)
+            }}
+          >
+            <MenuItem
+              key={null}
+              value={"unclassified"}
+            >
+              未分類
+            </MenuItem>
+            {/* TODO: ticketsはstoreで状態管理させる */}
+            {ticketItems.map((ticket) => {
+              return (
+                ticket.status != Statuses.Done && (
+                  <MenuItem
+                    key={ticket.id}
+                    value={ticket.id}
+                  >
+                    {ticket.title}
+                  </MenuItem>
+                )
+              );
+            })}
+          </Select>
+        </FormControl>
+      </div>
       {taskItems && (
         <Nestable
           items={taskItems}

@@ -73,7 +73,7 @@ export async function PUT(
 
   try {
     const { id } = params;
-    const data = { updatedAt: new Date(), ...(await request.json()) };
+    const data = { updatedAt: new Date(), ...(await request.json())};
     result = await prisma.ticket.update({
       where: {
         id: Number(id),
