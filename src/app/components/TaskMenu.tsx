@@ -24,7 +24,7 @@ const TaskMenu = (
   const createNewTask = async () => {
     try {
       const { data } = await storeTask({
-        isSurveyTask: false,
+        isSurveyTask: true,
         status: Statuses.NotYet,
         type: TaskTypes.FirstTask,
         title: "",
