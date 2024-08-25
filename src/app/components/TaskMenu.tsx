@@ -84,7 +84,6 @@ const TaskMenu = (
       {isHidden ? "下層タスク表示": "下層タスク非表示"}
     </Button>
     <Link
-      target={"_blank"}
       style={{ display: "inline-block", marginLeft: "30px" }}
       href="/tickets"
     >

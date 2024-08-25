@@ -124,7 +124,7 @@ export default function TicketView() {
       <Button variant="contained" onClick={openModal}>
         チケット作成
       </Button>
-      <Link href="/">
+      <Link href="/tasks">
         <p>タスク一覧へ</p>
       </Link>
       <TableContainer sx={{ maxHeight: 800 }}>

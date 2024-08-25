@@ -230,9 +230,8 @@ const Task = ({
         }}
       >
         <Link
-        target={"_blank"}
-        style={{ display: "inline-block", marginLeft: "30px" }}
-        href={`/tasks/${task.id}`}
+          style={{ display: "inline-block", marginLeft: "30px" }}
+          href={`/tasks/${task.id}`}
         >
           タスクNo.{task.id}
         </Link>
