@@ -13,7 +13,7 @@ export default function TaskView() {
 
   return (
     <>
-      {/* <TaskMenu onCreateTopTask={setNewTaskItem}/> */}
+      <TaskMenu onCreateTopTask={setNewTaskItem} isChildTask={true}/>
       <TaskArea createdTopTask={newTaskItem} pathParameterTaskId={params.id as string}/>
     </>
   );

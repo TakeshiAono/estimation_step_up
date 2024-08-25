@@ -6,12 +6,20 @@ import { useState } from "react";
 import { Statuses, TaskTypes } from "../constants/TaskConstants";
 
 type Props = {
-  onCreateTopTask: (task: Task) => void
+  onCreateTopTask: (task: Task) => void;
+  onMinimum?: (isMinimum: boolean) => void;
+  isMinimum?: boolean;
+  isChildTask?: boolean;
 }
 
-const TaskMenu = ({ onCreateTopTask }: Props) => {
+const TaskMenu = (
+  {
+    onCreateTopTask,
+    onMinimum,
+    isMinimum,
+    isChildTask
+  }: Props) => {
   const [isHidden, setIsHidden] = useState(false);
-  const [isMinimum, setIsMinimum] = useState(true);
 
   const createNewTask = async () => {
     try {
@@ -62,7 +70,7 @@ const TaskMenu = ({ onCreateTopTask }: Props) => {
       color="success"
       style={{ marginRight: "20px" }}
       onClick={() => {
-        setIsMinimum(!isMinimum);
+        if(onMinimum) onMinimum(prev => !prev);
       }}
     >
       {isMinimum ? "タスク通常表示" : "タスク最小表示"}
@@ -82,9 +90,21 @@ const TaskMenu = ({ onCreateTopTask }: Props) => {
     >
       <p>チケット一覧へ</p>
     </Link>
-    <Button variant="contained" onClick={createNewTask}>
-      タスク追加
-    </Button>
+    {isChildTask ||
+      <>
+        <Button variant="contained" onClick={createNewTask}>
+          タスク追加
+        </Button>
+      </>
+    }
+    {isChildTask &&
+        <Link
+          style={{ display: "inline-block", marginLeft: "30px" }}
+          href="/tasks"
+        >
+        <p>タスク一覧へ</p>
+        </Link>
+    }
   </>
   );
 };

@@ -8,11 +8,12 @@ import TaskMenu from "../components/TaskMenu";
 
 export default function TaskView() {
   const [newTaskItem, setNewTaskItem] = useState<TaskType>(null);
+  const [isMinimum, setIsMinimum] = useState(true);
 
   return (
     <>
-      <TaskMenu onCreateTopTask={setNewTaskItem}/>
-      <TaskArea createdTopTask={newTaskItem}/>
+      <TaskMenu onCreateTopTask={setNewTaskItem} onMinimum={setIsMinimum} isMinimum={isMinimum}/>
+      <TaskArea createdTopTask={newTaskItem} isMinimum={isMinimum}/>
     </>
   );
 }

@@ -5,23 +5,24 @@ import Task from "./Task";
 import _ from "lodash";
 import Nestable from "react-nestable";
 import axios from "axios";
-import type { Task } from "@/schema/zod";
+import type { Task as TaskType } from "@/schema/zod";
 import Timer from "./Timer";
 
 type Props = {
   createdTopTask: Task;
-  pathParameterTaskId: string;
+  pathParameterTaskId?: string;
+  isMinimum?: boolean;
 }
 
 export default function TaskArea({
   createdTopTask,
-  pathParameterTaskId
+  pathParameterTaskId,
+  isMinimum
 }: Props) {
   const [seconds, setSeconds] = useState(0);
-  const [taskItems, setTaskItems] = useState<Task[]>([]);
+  const [taskItems, setTaskItems] = useState<TaskType[]>([]);
   const [isHidden, setIsHidden] = useState(false);
   const [operatingTaskId, setOperatingTaskId] = useState(null);
-  const [isMinimum, setIsMinimum] = useState(true);
 
   const renderTask = ({ item }: { item: Task }) => {
     return (
@@ -51,7 +52,7 @@ export default function TaskArea({
       return data;
     };
 
-    fetchTaskItems().then((data) => {
+    fetchTaskItems().then((data: TaskType[]) => {
       console.log("取得データ", data);
       const parentTasks = pathParameterTaskId ? data : data.filter((task) => task.parentId === null)
       setTaskItems(parentTasks);
@@ -94,7 +95,7 @@ export default function TaskArea({
   };
 
   const _getTargetTaskPositionBFS = (
-    taskItems: Task[],
+    taskItems: TaskType[],
     taskId: number
   ): number[] => {
     let originNodeAndPosition: [Task, number[]] = [];
@@ -125,7 +126,7 @@ export default function TaskArea({
   };
 
   const storeTasks = async (items) => {
-    return await axios.put<Task>(
+    return await axios.put<TaskType>(
       `http://localhost:3001/api/tasks/bulk`,
       JSON.stringify(items)
     );
