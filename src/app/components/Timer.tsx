@@ -41,23 +41,10 @@ const Timer = ({
   }, [])
 
   useEffect(() => {
-    isResting || onTimerUpdate(sumTime);
-    if (sumTime != 0) {
-      isResting
-        ? setRestSeconds((prev) => prev - 1)
-        : setOperatingSeconds((prev) => prev - 1);
-    }
-    if (restSeconds === 0 || operatingSeconds === 0) {
-      soundPlay();
-      timerReset();
-    }
-  }, [sumTime]);
-
-  useEffect(() => {
-    if(!isStarting && sumTime !== 0) {
+    if(!isStarting && sumTime >= 0) {
       timer.current = setInterval(() => {
         notifySoundPlay()
-      }, 20000);
+      }, 10000);
     } else {
       clearInterval(timer.current)
     }
@@ -77,6 +64,11 @@ const Timer = ({
     localStorage.setItem("inputRestMinutes", inputRestMinutes.toString())
   }, [inputRestMinutes])
 
+  worker.onmessage = () => {
+    localStorage.setItem("sumTime", Number(sumTime));
+    addSum.current();
+  };
+
   const addSum = useRef(() => {
     setSumTime((prevSumTime) => {
       const newSumTime = prevSumTime + 1;
@@ -84,16 +76,28 @@ const Timer = ({
     });
   });
 
-  worker.onmessage = (e) => {
-    localStorage.setItem("sumTime", Number(sumTime));
-    addSum.current(e.data);
-  };
+  useEffect(() => {
+    isResting || onTimerUpdate(sumTime);
 
-  const timerStart = async () => {
-    if (!isStarting) {
-      worker.postMessage("start");
-      setIsStarting(true);
+    if (sumTime != 0) {
+      isResting
+        ? setRestSeconds((prev) => prev - 1)
+        : setOperatingSeconds((prev) => prev - 1);
     }
+
+    if (restSeconds === 0 || operatingSeconds === 0) {
+      soundPlay();
+      timerReset();
+    }
+  }, [sumTime]);
+
+  const timerReset = () => {
+    timerPause()
+    setSumTime(0)
+    setTimeout(() => {
+      setOperatingSeconds(inputOperatingMinutes * 60);
+      setRestSeconds(inputRestMinutes * 60);
+    }, 10);
   };
 
   const timerPause = () => {
@@ -101,13 +105,12 @@ const Timer = ({
     setIsStarting(false);
   };
 
-  const timerReset = () => {
-    timerPause();
+  const timerStart = async () => {
     setSumTime(0)
-    setTimeout(() => {
-      setOperatingSeconds(inputOperatingMinutes * 60);
-      setRestSeconds(inputRestMinutes * 60);
-    }, 10);
+    if (!isStarting) {
+      worker.postMessage("start");
+      setIsStarting(true);
+    }
   };
 
   const timerSwitch = () => {
@@ -138,6 +141,8 @@ const Timer = ({
       titleButtons={{ max: false, min: false, close: false }}
     >
       <div className={isResting ? styles.restTimer : styles.operatingTimer}>
+        {/* TODO:更新したらお知らせ音が鳴らなくなる問題を解決できるまでは出しておく、workerにタイマー値を持たせたらよくなると思う。 */}
+        {sumTime}
         <h1>ポモドーロタイマー </h1>
         <div style={{ fontSize: "100px" }}>
           {isResting ? (
