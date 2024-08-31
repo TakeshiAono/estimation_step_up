@@ -90,14 +90,6 @@ const Task = ({
   const [taskItems, setTaskItems] = useState<TaskItem[]>([{id: 0, title: "", hour: 0}]);
 
   useEffect(() => {
-    if (!isEditing) mutationTask(); //編集が完了した瞬間にmutationする
-  }, [isEditing]);
-
-  useEffect(() => {
-    mutationTask()
-  }, [isSurveyTask])
-
-  useEffect(() => {
     if (operatingTaskId == task.id) {
       if (isSurveyTask) {
         setSurveyTime(surveyTime + 1);
@@ -119,18 +111,14 @@ const Task = ({
   };
 
   useEffect(() => {
-    if (operatingTime % 300 === 0) {
-      //NOTE:5分ごとに自動保存されるようにする。
-      updateTime();
-    }
-  }, [operatingTime]);
+    if(status === Statuses.Run) {
 
-  useEffect(() => {
-    if (surveyTime % 300 === 0) {
-      //NOTE:5分ごとに自動保存されるようにする。
-      updateTime();
+      if (operatingTime % 300 === 0) {
+        //NOTE:5分ごとに自動保存されるようにする。
+        updateTime();
+      }
     }
-  }, [surveyTime]);
+  }, [operatingTime, surveyTime]);
 
   const updateTime = async () => {
     return await axios.patch(
@@ -261,6 +249,7 @@ const Task = ({
               variant="contained"
               color="info"
               onClick={() => {
+                mutationTask()
                 setIsEditing(!isEditing);
               }}
             >
@@ -271,6 +260,7 @@ const Task = ({
               variant="contained"
               color="secondary"
               onClick={() => {
+                mutationTask()
                 setIsEditing(!isEditing);
               }}
             >
@@ -327,6 +317,7 @@ const Task = ({
               label="調査中"
               variant="outlined"
               onChange={() => {
+                mutationTask()
                 setIsSurveyTask(true);
               }}
             />
@@ -335,6 +326,7 @@ const Task = ({
               label="実装中"
               variant="outlined"
               onChange={() => {
+                mutationTask()
                 setIsSurveyTask(false);
               }}
             />
@@ -363,6 +355,21 @@ const Task = ({
             {Math.floor(operatingTime / 3600)}:{Math.floor(operatingTime / 60 % 60)}:{operatingTime % 60}
           </p>
         </div>
+        { isSurveyTask &&
+          <div className={styles.taskColumn} style={{marginRight: "20px"}}>
+            <InputLabel>調査内容</InputLabel>
+            <TextField
+              value={surveyDetail}
+              disabled={!isEditing}
+              variant="outlined"
+              multiline
+              onChange={(event) => {
+                setSurveyDetail(event.target.value);
+              }}
+              sx={{width: "400px"}}
+            />
+          </div>
+        }
         <div className={styles.inputBlock}>
           <InputLabel>状況</InputLabel>
           <Select
