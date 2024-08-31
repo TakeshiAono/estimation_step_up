@@ -1,9 +1,9 @@
 import { PrismaClient, Task } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient()
-
 export async function POST(request: NextRequest, {params}: {params: Task}): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   let result = null
   let status = 200
 
@@ -80,6 +80,7 @@ export async function POST(request: NextRequest, {params}: {params: Task}): Prom
     console.log("Error: ", e)
     status = 400
   } finally {
+    prisma.$disconnect()
     return NextResponse.json(result, {status: status});
   }
 }

@@ -2,12 +2,12 @@ import { Task } from "@/schema/zod";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Task }
 ): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   let status = 200;
 
   const body: Task[] = await request.json()
@@ -48,6 +48,7 @@ export async function POST(
     console.log("Error: ", e);
     status = 400;
   } finally {
+    prisma.$disconnect()
     return NextResponse.json(results, { status: status });
   }
 }

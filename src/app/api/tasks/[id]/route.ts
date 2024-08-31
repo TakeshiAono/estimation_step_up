@@ -1,12 +1,13 @@
 import { PrismaClient, Ticket } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export async function GET(
   _: any,
   { params }: { params: { id: string } }
 ): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   const ticket = await prisma.task.findMany({
     where: {
       id: Number(params.id),
@@ -61,6 +62,7 @@ export async function GET(
     }
   });
 
+  prisma.$disconnect()
   return NextResponse.json(ticket);
 }
 
@@ -68,6 +70,8 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Ticket }
 ): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   let result = null;
   let status = 200;
 
@@ -85,6 +89,7 @@ export async function PUT(
     console.log("Error: ", e);
     status = 400;
   } finally {
+    prisma.$disconnect()
     return NextResponse.json(result, { status: status });
   }
 }
@@ -93,6 +98,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Ticket }
 ): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   // FIXME: curl -X PUT -H "Content-Type: application/json" -d '{"title":"タイトル"}' 'http://localhost:3001/api/tickets/2'
   let result = null;
   let status = 200;
@@ -131,6 +138,7 @@ export async function PATCH(
     console.log("Error: ", e);
     status = 400;
   } finally {
+    prisma.$disconnect()
     return NextResponse.json(result, { status: status });
   }
 }
@@ -139,6 +147,8 @@ export async function DELETE(
   _: NextRequest,
   { params }: { params: Ticket }
 ): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   let result = null;
   let status = 200;
 
@@ -155,6 +165,7 @@ export async function DELETE(
     console.log(e);
     status = 400;
   } finally {
+    prisma.$disconnect()
     return NextResponse.json(result, { status: status });
   }
 }

@@ -3,8 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import _ from "lodash"
 
-const prisma = new PrismaClient()
-
 type Hierarchy = {
   parentId: number;
   childId: number | null;
@@ -30,6 +28,8 @@ const depthSearch = (parentTask: BigTask): Hierarchy[]  => {
 }
 
 export async function PUT(request: NextRequest, {params}: {params: Task}): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
+
   let result = null
   let status = 200
 
@@ -68,6 +68,7 @@ export async function PUT(request: NextRequest, {params}: {params: Task}): Promi
     console.log("Error: ", e)
     status = 400
   } finally {
+    prisma.$disconnect()
     return NextResponse.json(result, {status: status});
   }
 }
