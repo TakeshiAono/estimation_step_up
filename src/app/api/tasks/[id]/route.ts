@@ -1,3 +1,4 @@
+import { Statuses } from "@/app/constants/TaskConstants";
 import { PrismaClient, Ticket } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -106,6 +107,9 @@ export async function PATCH(
     const { id } = params;
     const { seconds, plan, check, feedback, achievement, ...other } =
       await request.json();
+    if (achievement.operatingTime > 0 || achievement.surveyTime > 0) {
+      other.status = Statuses.Run;
+    }
     const data = { updatedAt: new Date(), ...other };
     result = await prisma.task.update({
       where: {
