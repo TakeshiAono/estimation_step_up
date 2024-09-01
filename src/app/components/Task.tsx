@@ -13,7 +13,7 @@ import {
 import Radio from "@mui/joy/Radio";
 import RadioGroup from "@mui/joy/RadioGroup";
 import styles from "../css/Task.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import _ from "lodash";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -90,6 +90,11 @@ const Task = ({
   const [taskItems, setTaskItems] = useState<TaskItem[]>([
     { id: 0, title: "", hour: 0 },
   ]);
+  const isInitialRender = useRef(true)
+
+  useEffect(() => {
+    isInitialRender.current = false
+  }, [])
 
   useEffect(() => {
     if (operatingTaskId == task.id) {
@@ -102,9 +107,10 @@ const Task = ({
   }, [seconds]);
 
   useEffect(() => {
-    if (createFlg && isSelectToAddTask) {
+    if (!isInitialRender.current) {
+      mutationTask()
     }
-  }, [createFlg]);
+  }, [status]);
 
   const switchOperatingTask = () => {
     operatingTaskId == task.id
@@ -269,28 +275,27 @@ const Task = ({
           )}
         </div>
         <div style={{ marginLeft: "20px" }}>
-          {isEditing &&
-            (status != Statuses.Done ? (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setStatus(Statuses.Done);
-                }}
-              >
-                タスク完了
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="inherit"
-                onClick={() => {
-                  setStatus(Statuses.Run);
-                }}
-              >
-                実施中に戻す
-              </Button>
-            ))}
+          {(status != Statuses.Done ? (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setStatus(Statuses.Done);
+              }}
+            >
+              タスク完了
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="inherit"
+              onClick={() => {
+                setStatus(Statuses.Run);
+              }}
+            >
+              実施中に戻す
+            </Button>
+          ))}
           {
             <Button
               variant="contained"
