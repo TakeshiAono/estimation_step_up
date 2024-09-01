@@ -29,7 +29,7 @@ export default function TicketView() {
   const [status, setStatus] = useState("NotYet");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
-  const [ticketItems, setTicketItems] = useState<any>([])
+  const [ticketItems, setTicketItems] = useState<any>([]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -37,22 +37,25 @@ export default function TicketView() {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      const {data} = await axios.get("http://localhost:3001/api/tickets")
-      return data.sort((item) => item.id).reverse()
-    }
+      const { data } = await axios.get("http://localhost:3001/api/tickets");
+      return data.sort((item) => item.id).reverse();
+    };
 
     fetchTickets().then((tickets) => {
-      const changedStatusItems = tickets.map(ticket => {
-        const {status, ...others} = ticket
-        const stringStatusCode = _.findKey(Statuses, (value) => value === status)
-        return {status: stringStatusCode, ...others}
-      })
-      setTicketItems(changedStatusItems)
-    })
-  }, [])
+      const changedStatusItems = tickets.map((ticket) => {
+        const { status, ...others } = ticket;
+        const stringStatusCode = _.findKey(
+          Statuses,
+          (value) => value === status,
+        );
+        return { status: stringStatusCode, ...others };
+      });
+      setTicketItems(changedStatusItems);
+    });
+  }, []);
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
@@ -61,8 +64,8 @@ export default function TicketView() {
   const TicketStatuses = {
     NotYet: 0,
     Run: 1,
-    Done: 2
-  }
+    Done: 2,
+  };
 
   interface Column {
     id: "id" | "title" | "url" | "numberOfTask" | "totalTime" | "status";
@@ -87,44 +90,56 @@ export default function TicketView() {
     title: string,
     url: number,
     numberOfTask: number,
-    totalTime: number
+    totalTime: number,
   ) {
     return { id, status, title, url, numberOfTask, totalTime };
   }
 
   const createTicket = async () => {
-    const foundItem = _.maxBy(ticketItems, (item) => Number(item.id))
+    const foundItem = _.maxBy(ticketItems, (item) => Number(item.id));
 
-    let nextId
+    let nextId;
     if (foundItem) {
-      nextId = Number(foundItem.id) + 1
+      nextId = Number(foundItem.id) + 1;
     } else {
-      nextId = 1
+      nextId = 1;
     }
 
     try {
-      await axios.post(`http://localhost:3001/api/tickets/create`, JSON.stringify({title: title, status: TicketStatuses[status], url: url}))
-      const newItem = createData(nextId.toString(), TicketStatuses[status], title, url, 0, 0)
-      setTicketItems([ newItem, ...ticketItems])
+      await axios.post(
+        `http://localhost:3001/api/tickets/create`,
+        JSON.stringify({
+          title: title,
+          status: TicketStatuses[status],
+          url: url,
+        }),
+      );
+      const newItem = createData(
+        nextId.toString(),
+        TicketStatuses[status],
+        title,
+        url,
+        0,
+        0,
+      );
+      setTicketItems([newItem, ...ticketItems]);
     } catch (e) {
-      console.log("リクエストエラー")
+      console.log("リクエストエラー");
     } finally {
-      closeModal()
+      closeModal();
     }
-  }
+  };
 
   const openModal = () => {
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   const closeModal = () => {
-    setIsModalOpen(false)
-  }
+    setIsModalOpen(false);
+  };
 
   const changeStatusId = (event) => {
-    setStatus(
-      event.target.value,
-    );
+    setStatus(event.target.value);
   };
 
   return (
@@ -156,18 +171,20 @@ export default function TicketView() {
               .map((row) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                    {columns.map(column => {
+                    {columns.map((column) => {
                       const value = row[column.id];
-                      return (
-                        (
-                          column.label == "URL"
-                          ? <TableCell><Link href={value} target="_blank">{value}</Link></TableCell>
-                          : <TableCell key={column.id} align={column.align}>
+                      return column.label == "URL" ? (
+                        <TableCell>
+                          <Link href={value} target="_blank">
+                            {value}
+                          </Link>
+                        </TableCell>
+                      ) : (
+                        <TableCell key={column.id} align={column.align}>
                           {column.format && typeof value === "number"
                             ? column.format(value)
                             : value}
-                            </TableCell>
-                        )
+                        </TableCell>
                       );
                     })}
                   </TableRow>
@@ -186,29 +203,44 @@ export default function TicketView() {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
 
-      <TicketModal onSuccess={createTicket} isOpen={isModalOpen} onCloseModal={closeModal}>
-        <FormControl variant={"filled"} sx={{
-          mt: 2,
-          minWidth: 120,
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          gap: 5, // 子要素間にスペースを持たせる
-        }}>
-          <TextField label="タイトル" variant="outlined" onChange={(e) => {setTitle(e.target.value)}}/>
+      <TicketModal
+        onSuccess={createTicket}
+        isOpen={isModalOpen}
+        onCloseModal={closeModal}
+      >
+        <FormControl
+          variant={"filled"}
+          sx={{
+            mt: 2,
+            minWidth: 120,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 5, // 子要素間にスペースを持たせる
+          }}
+        >
+          <TextField
+            label="タイトル"
+            variant="outlined"
+            onChange={(e) => {
+              setTitle(e.target.value);
+            }}
+          />
           <FormControl variant="outlined" sx={{ minWidth: 120 }}>
             <InputLabel id="demo-simple-select-label">Status</InputLabel>
-            <Select
-              value={status}
-              label={"Status"}
-              onChange={changeStatusId}
-            >
+            <Select value={status} label={"Status"} onChange={changeStatusId}>
               <MenuItem value={"NotYet"}>未実施</MenuItem>
               <MenuItem value={"Run"}>実行中</MenuItem>
               <MenuItem value={"Done"}>完了</MenuItem>
             </Select>
           </FormControl>
-          <TextField label="URL" variant="outlined" onChange={(e) => {setUrl(e.target.value)}}/>
+          <TextField
+            label="URL"
+            variant="outlined"
+            onChange={(e) => {
+              setUrl(e.target.value);
+            }}
+          />
         </FormControl>
       </TicketModal>
     </>

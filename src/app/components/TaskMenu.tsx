@@ -10,15 +10,14 @@ type Props = {
   onMinimum?: (isMinimum: boolean) => void;
   isMinimum?: boolean;
   isChildTask?: boolean;
-}
+};
 
-const TaskMenu = (
-  {
-    onCreateTopTask,
-    onMinimum,
-    isMinimum,
-    isChildTask
-  }: Props) => {
+const TaskMenu = ({
+  onCreateTopTask,
+  onMinimum,
+  isMinimum,
+  isChildTask,
+}: Props) => {
   const [isHidden, setIsHidden] = useState(false);
 
   const createNewTask = async () => {
@@ -52,59 +51,59 @@ const TaskMenu = (
         ticketId: ticketId,
         title: title,
         parentId: parentId,
-      })
+      }),
     );
   };
 
   return (
-  <>
-    <Button
-      variant="contained"
-      color="warning"
-      style={{ marginRight: "20px" }}
-    >
-      タスク更新
-    </Button>
-    <Button
-      variant="contained"
-      color="success"
-      style={{ marginRight: "20px" }}
-      onClick={() => {
-        if(onMinimum) onMinimum(prev => !prev);
-      }}
-    >
-      {isMinimum ? "タスク通常表示" : "タスク最小表示"}
-    </Button>
-    <Button
-      variant="contained"
-      onClick={() => {
-        setIsHidden(!isHidden);
-      }}
-    >
-      {isHidden ? "下層タスク表示": "下層タスク非表示"}
-    </Button>
-    <Link
-      style={{ display: "inline-block", marginLeft: "30px" }}
-      href="/tickets"
-    >
-      <p>チケット一覧へ</p>
-    </Link>
-    {isChildTask ||
-      <>
-        <Button variant="contained" onClick={createNewTask}>
-          タスク追加
-        </Button>
-      </>
-    }
-    {isChildTask &&
+    <>
+      <Button
+        variant="contained"
+        color="warning"
+        style={{ marginRight: "20px" }}
+      >
+        タスク更新
+      </Button>
+      <Button
+        variant="contained"
+        color="success"
+        style={{ marginRight: "20px" }}
+        onClick={() => {
+          if (onMinimum) onMinimum((prev) => !prev);
+        }}
+      >
+        {isMinimum ? "タスク通常表示" : "タスク最小表示"}
+      </Button>
+      <Button
+        variant="contained"
+        onClick={() => {
+          setIsHidden(!isHidden);
+        }}
+      >
+        {isHidden ? "下層タスク表示" : "下層タスク非表示"}
+      </Button>
+      <Link
+        style={{ display: "inline-block", marginLeft: "30px" }}
+        href="/tickets"
+      >
+        <p>チケット一覧へ</p>
+      </Link>
+      {isChildTask || (
+        <>
+          <Button variant="contained" onClick={createNewTask}>
+            タスク追加
+          </Button>
+        </>
+      )}
+      {isChildTask && (
         <Link
           style={{ display: "inline-block", marginLeft: "30px" }}
           href="/tasks"
         >
           <p>タスク一覧へ</p>
         </Link>
-    }
-  </>
+      )}
+    </>
   );
 };
 

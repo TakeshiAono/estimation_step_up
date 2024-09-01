@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import _ from "lodash";
-import type { Task as TaskType} from "@/schema/zod";
+import type { Task as TaskType } from "@/schema/zod";
 import TaskArea from "../components/TaskArea";
 import TaskMenu from "../components/TaskMenu";
 
@@ -12,8 +12,12 @@ export default function TaskView() {
 
   return (
     <>
-      <TaskMenu onCreateTopTask={setNewTaskItem} onMinimum={setIsMinimum} isMinimum={isMinimum}/>
-      <TaskArea createdTopTask={newTaskItem} isMinimum={isMinimum}/>
+      <TaskMenu
+        onCreateTopTask={setNewTaskItem}
+        onMinimum={setIsMinimum}
+        isMinimum={isMinimum}
+      />
+      <TaskArea createdTopTask={newTaskItem} isMinimum={isMinimum} />
     </>
   );
 }

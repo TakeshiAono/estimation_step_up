@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   _: any,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ): Promise<Promise<unknown>> {
   const prisma = new PrismaClient();
 
@@ -18,7 +18,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Ticket }
+  { params }: { params: Ticket },
 ): Promise<Promise<unknown>> {
   const prisma = new PrismaClient();
 
@@ -39,14 +39,14 @@ export async function PUT(
   } catch (e) {
     status = 400;
   } finally {
-    prisma.$disconnect()
+    prisma.$disconnect();
     return NextResponse.json(result, { status: status });
   }
 }
 
 export async function DELETE(
   _: NextRequest,
-  { params }: { params: Ticket }
+  { params }: { params: Ticket },
 ): Promise<Promise<unknown>> {
   const prisma = new PrismaClient();
 
@@ -65,7 +65,7 @@ export async function DELETE(
   } catch (e) {
     status = 400;
   } finally {
-    prisma.$disconnect()
+    prisma.$disconnect();
     return NextResponse.json(result, { status: status });
   }
 }

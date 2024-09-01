@@ -2,16 +2,18 @@ import { Statuses } from "@/app/constants/TaskConstants";
 import { PrismaClient, Task } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Task },
+): Promise<Promise<unknown>> {
+  const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest, {params}: {params: Task}): Promise<Promise<unknown>> {
-  const prisma = new PrismaClient()
+  let tasks = null;
+  let status = 200;
 
-  let tasks = null
-  let status = 200
-
-  let ticketId = null
+  let ticketId = null;
   if (request.nextUrl.searchParams.has("ticketId")) {
-    ticketId = request.nextUrl.searchParams.get("ticketId")
+    ticketId = request.nextUrl.searchParams.get("ticketId");
   }
 
   try {
@@ -20,8 +22,8 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
         ticketId: Number(ticketId),
         parentId: null,
         status: {
-          not: Statuses.Done
-        }
+          not: Statuses.Done,
+        },
       },
       include: {
         plans: true,
@@ -31,8 +33,8 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
         children: {
           where: {
             status: {
-              not: Statuses.Done
-            }
+              not: Statuses.Done,
+            },
           },
           include: {
             plans: true,
@@ -42,8 +44,8 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
             children: {
               where: {
                 status: {
-                  not: Statuses.Done
-                }
+                  not: Statuses.Done,
+                },
               },
               include: {
                 plans: true,
@@ -53,8 +55,8 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
                 children: {
                   where: {
                     status: {
-                      not: Statuses.Done
-                    }
+                      not: Statuses.Done,
+                    },
                   },
                   include: {
                     plans: true,
@@ -64,8 +66,8 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
                     children: {
                       where: {
                         status: {
-                          not: Statuses.Done
-                        }
+                          not: Statuses.Done,
+                        },
                       },
                       include: {
                         plans: true,
@@ -75,35 +77,34 @@ export async function GET(request: NextRequest, {params}: {params: Task}): Promi
                         children: {
                           where: {
                             status: {
-                              not: Statuses.Done
-                            }
+                              not: Statuses.Done,
+                            },
                           },
                           include: {
                             plans: true,
                             achievements: true,
                             checks: true,
                             feedbacks: true,
-                            children: {
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                            children: {},
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    console.log("get tasks complete")
-  } catch(e) {
-    console.log("Error: ", e)
-    status = 400
+    console.log("get tasks complete");
+  } catch (e) {
+    console.log("Error: ", e);
+    status = 400;
   } finally {
-    prisma.$disconnect()
-    return NextResponse.json(tasks, {status: status});
+    prisma.$disconnect();
+    return NextResponse.json(tasks, { status: status });
   }
 }

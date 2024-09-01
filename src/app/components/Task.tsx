@@ -32,7 +32,7 @@ type Props = {
   onAddTask: (id: number) => void;
   onAddTasks: (id: number, taskTitles: string[]) => void;
   onModalOpen: (isModalOpen: boolean) => void;
-  onSelectedModalItem: (taskItem: any) => void
+  onSelectedModalItem: (taskItem: any) => void;
   createFlg: boolean;
 };
 
@@ -41,7 +41,7 @@ type TaskItem = {
   title: string;
   hour: number;
   ticketItems: any[];
-}
+};
 
 const Task = ({
   seconds,
@@ -59,12 +59,12 @@ const Task = ({
   onSelectedModalItem,
   createFlg,
   onAddTasks,
-  ticketItems
+  ticketItems,
 }: Props) => {
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
   const [operatingTime, setOperatingTime] = useState(
-    achievements.operatingTime
+    achievements.operatingTime,
   );
   const [surveyTime, setSurveyTime] = useState(achievements.surveyTime);
   const [isEditing, setIsEditing] = useState(false);
@@ -84,10 +84,12 @@ const Task = ({
   const [predictionSurveyTimeOfFinal, setPredictionSurveyTimeOfFinal] =
     useState(task.plans[0].predictionSurveyTimeOfFinal);
   const [surveyDetail, setSurveyDetail] = useState(task.plans[0].surveyDetail);
-  const [isSelectToAddTask, setIsSelectToAddTask] = useState(false)
+  const [isSelectToAddTask, setIsSelectToAddTask] = useState(false);
   const [childrenTaskTitles, setChildrenTaskTitles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [taskItems, setTaskItems] = useState<TaskItem[]>([{id: 0, title: "", hour: 0}]);
+  const [taskItems, setTaskItems] = useState<TaskItem[]>([
+    { id: 0, title: "", hour: 0 },
+  ]);
 
   useEffect(() => {
     if (operatingTaskId == task.id) {
@@ -100,7 +102,7 @@ const Task = ({
   }, [seconds]);
 
   useEffect(() => {
-    if(createFlg && isSelectToAddTask) {
+    if (createFlg && isSelectToAddTask) {
     }
   }, [createFlg]);
 
@@ -111,8 +113,7 @@ const Task = ({
   };
 
   useEffect(() => {
-    if(status === Statuses.Run) {
-
+    if (status === Statuses.Run) {
       if (operatingTime % 300 === 0) {
         //NOTE:5分ごとに自動保存されるようにする。
         updateTime();
@@ -126,7 +127,7 @@ const Task = ({
       {
         surveyTime: surveyTime,
         operatingTime: operatingTime,
-      }
+      },
     );
   };
 
@@ -231,14 +232,13 @@ const Task = ({
               >
                 作業開始
               </Button>
-            ))
-          }
+            ))}
         </div>
         <Button
           variant="contained"
           color="primary"
           onClick={() => {
-            setIsModalOpen(true)
+            setIsModalOpen(true);
           }}
         >
           子タスク追加
@@ -249,7 +249,7 @@ const Task = ({
               variant="contained"
               color="info"
               onClick={() => {
-                mutationTask()
+                mutationTask();
                 setIsEditing(!isEditing);
               }}
             >
@@ -260,7 +260,7 @@ const Task = ({
               variant="contained"
               color="secondary"
               onClick={() => {
-                mutationTask()
+                mutationTask();
                 setIsEditing(!isEditing);
               }}
             >
@@ -317,7 +317,7 @@ const Task = ({
               label="調査中"
               variant="outlined"
               onChange={() => {
-                mutationTask()
+                mutationTask();
                 setIsSurveyTask(true);
               }}
             />
@@ -326,7 +326,7 @@ const Task = ({
               label="実装中"
               variant="outlined"
               onChange={() => {
-                mutationTask()
+                mutationTask();
                 setIsSurveyTask(false);
               }}
             />
@@ -346,17 +346,19 @@ const Task = ({
         <div className={styles.operatedTime}>
           <InputLabel>調査時間</InputLabel>
           <p style={{ fontSize: "30px", alignItems: "center", margin: "0px" }}>
-            {Math.floor(surveyTime / 3600)}:{Math.floor(surveyTime / 60 % 60)}:{surveyTime % 60}
+            {Math.floor(surveyTime / 3600)}:{Math.floor((surveyTime / 60) % 60)}
+            :{surveyTime % 60}
           </p>
         </div>
         <div className={styles.operatedTime}>
           <InputLabel>実働時間</InputLabel>
           <p style={{ fontSize: "30px", alignItems: "center", margin: "0px" }}>
-            {Math.floor(operatingTime / 3600)}:{Math.floor(operatingTime / 60 % 60)}:{operatingTime % 60}
+            {Math.floor(operatingTime / 3600)}:
+            {Math.floor((operatingTime / 60) % 60)}:{operatingTime % 60}
           </p>
         </div>
-        { isSurveyTask &&
-          <div className={styles.taskColumn} style={{marginRight: "20px"}}>
+        {isSurveyTask && (
+          <div className={styles.taskColumn} style={{ marginRight: "20px" }}>
             <InputLabel>調査内容</InputLabel>
             <TextField
               value={surveyDetail}
@@ -366,10 +368,10 @@ const Task = ({
               onChange={(event) => {
                 setSurveyDetail(event.target.value);
               }}
-              sx={{width: "400px"}}
+              sx={{ width: "400px" }}
             />
           </div>
-        }
+        )}
         <div className={styles.inputBlock}>
           <InputLabel>状況</InputLabel>
           <Select
@@ -510,89 +512,106 @@ const Task = ({
         )}
       </div>
       <TaskModal
-        onSuccess={() => {onAddTasks(task.id, taskItems)}}
+        onSuccess={() => {
+          onAddTasks(task.id, taskItems);
+        }}
         isOpen={isModalOpen}
-        onCloseModal={() => {setIsModalOpen(false)}}
+        onCloseModal={() => {
+          setIsModalOpen(false);
+        }}
       >
-
-        <FormControl variant={"filled"} sx={{
-          mt: 2,
-          minWidth: 120,
-          justifyContent: "flex-start",
-          gap: 5, // 子要素間にスペースを持たせる
-          width: "100%"
-        }}>
+        <FormControl
+          variant={"filled"}
+          sx={{
+            mt: 2,
+            minWidth: 120,
+            justifyContent: "flex-start",
+            gap: 5, // 子要素間にスペースを持たせる
+            width: "100%",
+          }}
+        >
           <div>
             <span>タイトル: </span>
             {task.title}
           </div>
           <div>
-            <Button 
+            <Button
               variant="contained"
               color="warning"
               onClick={() => {
-                if(taskItems.length > 0) {
-                  const maxId = _.maxBy(taskItems, "id").id
-                  setTaskItems([...taskItems, {id: maxId + 1, title:"", hour: 0}])
+                if (taskItems.length > 0) {
+                  const maxId = _.maxBy(taskItems, "id").id;
+                  setTaskItems([
+                    ...taskItems,
+                    { id: maxId + 1, title: "", hour: 0 },
+                  ]);
                 } else {
-                  setTaskItems([{id: 0, title:"", hour: 0}])
+                  setTaskItems([{ id: 0, title: "", hour: 0 }]);
                 }
               }}
             >
               行追加
             </Button>
           </div>
-          {
-            taskItems.map((taskItem, index) =>
-              <div key={index} style={{display: "flex"}}>
-                <TextField
-                  label="タイトル"
-                  variant="outlined"
-                  value={taskItem.title}
-                  onChange={(e) => {
-                    console.log(e.target.value)
-                    setTaskItems(
-                      taskItems.map((item) => {
-                        if(item.id == taskItem.id) {
-                          return {id: index, title: e.target.value, hour: taskItem.hour}
-                        } else {
-                          return item
-                        }
-                      })
-                    )
-                  }}
-                />
-                <TextField
-                  label="完了予測時間"
-                  variant="outlined"
-                  type="number"
-                  sx={{marginLeft: "50px"}}
-                  value={taskItem.hour}
-                  onChange={(e) => {
-                    setTaskItems(
-                      taskItems.map((item) => {
-                        if(item.id == taskItem.id) {
-                          return {id: index, title: taskItem.title, hour: e.target.value}
-                        } else {
-                          return item
-                        }
+          {taskItems.map((taskItem, index) => (
+            <div key={index} style={{ display: "flex" }}>
+              <TextField
+                label="タイトル"
+                variant="outlined"
+                value={taskItem.title}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setTaskItems(
+                    taskItems.map((item) => {
+                      if (item.id == taskItem.id) {
+                        return {
+                          id: index,
+                          title: e.target.value,
+                          hour: taskItem.hour,
+                        };
+                      } else {
+                        return item;
                       }
-                    ))}}
-                />
-                <Button
-                  sx={{marginLeft: "30px"}}
-                  variant="contained"
-                  color="error"
-                  onClick={() => {
-                    setTaskItems(
-                      taskItems.filter((item) => taskItem.id != item.id)
-                    )
-                  }}>
-                    削除
-                </Button>
-              </div>
-            )
-          }
+                    }),
+                  );
+                }}
+              />
+              <TextField
+                label="完了予測時間"
+                variant="outlined"
+                type="number"
+                sx={{ marginLeft: "50px" }}
+                value={taskItem.hour}
+                onChange={(e) => {
+                  setTaskItems(
+                    taskItems.map((item) => {
+                      if (item.id == taskItem.id) {
+                        return {
+                          id: index,
+                          title: taskItem.title,
+                          hour: e.target.value,
+                        };
+                      } else {
+                        return item;
+                      }
+                    }),
+                  );
+                }}
+              />
+              <Button
+                sx={{ marginLeft: "30px" }}
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  setTaskItems(
+                    taskItems.filter((item) => taskItem.id != item.id),
+                  );
+                }}
+              >
+                削除
+              </Button>
+            </div>
+          ))}
         </FormControl>
       </TaskModal>
     </div>

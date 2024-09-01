@@ -14,19 +14,21 @@ type Props = {
   createdTopTask: Task;
   pathParameterTaskId?: string;
   isMinimum?: boolean;
-}
+};
 
 export default function TaskArea({
   createdTopTask,
   pathParameterTaskId,
-  isMinimum
+  isMinimum,
 }: Props) {
   const [seconds, setSeconds] = useState(0);
   const [taskItems, setTaskItems] = useState<TaskType[]>([]);
   const [isHidden, setIsHidden] = useState(false);
   const [operatingTaskId, setOperatingTaskId] = useState(null);
   const [ticketItems, setTicketItems] = useState<any>([]);
-  const [selectSearchTicketId, setSelectSearchTicketId] = useState<number | null>(localStorage.getItem("selectSearchTicketId"))
+  const [selectSearchTicketId, setSelectSearchTicketId] = useState<
+    number | null
+  >(localStorage.getItem("selectSearchTicketId"));
 
   // TODO: ticketsはstoreで状態管理させる
   useEffect(() => {
@@ -37,26 +39,30 @@ export default function TaskArea({
     };
 
     fetchTickets().then((reuslt) => {
-      setTicketItems(
-        () => {
-          return reuslt
-        }
-      );
+      setTicketItems(() => {
+        return reuslt;
+      });
     });
   }, []);
 
   useEffect(() => {
     // TODO: パスパラメータがある時とない時のifが複数箇所に記載されているため別フックまたはコンポーネントにまとめる
-    if(!pathParameterTaskId) {
-      fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
-        console.log("取得データ", response.data);
-        const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
-        setTaskItems(parentTasks);
-      });
+    if (!pathParameterTaskId) {
+      fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then(
+        (response: TaskType[]) => {
+          console.log("取得データ", response.data);
+          const parentTasks = pathParameterTaskId
+            ? response.data
+            : response.data.filter((task) => task.parentId === null);
+          setTaskItems(parentTasks);
+        },
+      );
     } else {
       fetchChildTask(pathParameterTaskId).then((response: TaskType[]) => {
         console.log("取得データA", response.data);
-        const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
+        const parentTasks = pathParameterTaskId
+          ? response.data
+          : response.data.filter((task) => task.parentId === null);
         setTaskItems(parentTasks);
       });
     }
@@ -64,18 +70,24 @@ export default function TaskArea({
 
   useEffect(() => {
     // TODO: パスパラメータがある時とない時のifが複数箇所に記載されているため別フックまたはコンポーネントにまとめる
-    if(!pathParameterTaskId) {
-      fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then((response: TaskType[]) => {
-        console.log("取得データ", response.data);
-        const parentTasks = pathParameterTaskId ? response.data : response.data.filter((task) => task.parentId === null)
-        setTaskItems(parentTasks);
-      });
+    if (!pathParameterTaskId) {
+      fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then(
+        (response: TaskType[]) => {
+          console.log("取得データ", response.data);
+          const parentTasks = pathParameterTaskId
+            ? response.data
+            : response.data.filter((task) => task.parentId === null);
+          setTaskItems(parentTasks);
+        },
+      );
     }
-  }, [selectSearchTicketId])
+  }, [selectSearchTicketId]);
 
   const filterTaskItemByTicketId = () => {
-    return taskItems.filter(taskItem => taskItem.ticketId === selectSearchTicketId)
-  }
+    return taskItems.filter(
+      (taskItem) => taskItem.ticketId === selectSearchTicketId,
+    );
+  };
 
   const renderTask = ({ item }: { item: Task }) => {
     return (
@@ -101,21 +113,23 @@ export default function TaskArea({
   };
 
   const fetchTasksByTicketId = async (ticketId: number) => {
-    return await axios.get(`http://localhost:3001/api/tasks?ticketId=${ticketId}`);
+    return await axios.get(
+      `http://localhost:3001/api/tasks?ticketId=${ticketId}`,
+    );
   };
-
-
 
   useEffect(() => {
     createdTopTask && setTaskItems([createdTopTask, ...taskItems]);
   }, [createdTopTask]);
 
   const addTask = async (addToTaskId: number) => {
-    const { data } = await axios.post(`http://localhost:3001/api/tasks/create/child/${addToTaskId}`,)
+    const { data } = await axios.post(
+      `http://localhost:3001/api/tasks/create/child/${addToTaskId}`,
+    );
     const positions = _getTargetTaskPositionBFS(taskItems, addToTaskId);
     positions.reduce((accumulator, currentValue, index) => {
-      if (index == positions.length -1) {
-        accumulator[currentValue].children.unshift(data)
+      if (index == positions.length - 1) {
+        accumulator[currentValue].children.unshift(data);
         setTaskItems([...taskItems]);
         return;
       }
@@ -125,24 +139,27 @@ export default function TaskArea({
   };
 
   const addTasks = async (addToTaskId: number, taskTitles: string[]) => {
-    const { data } = await axios.post(`http://localhost:3001/api/tasks/${addToTaskId}/children/bulk`, taskTitles)
+    const { data } = await axios.post(
+      `http://localhost:3001/api/tasks/${addToTaskId}/children/bulk`,
+      taskTitles,
+    );
     const positions = _getTargetTaskPositionBFS(taskItems, addToTaskId);
     data.forEach((task: Task) => {
       positions.reduce((accumulator, currentValue, index) => {
-        if (index == positions.length -1) {
-          accumulator[currentValue].children.unshift(task)
+        if (index == positions.length - 1) {
+          accumulator[currentValue].children.unshift(task);
           setTaskItems([...taskItems]);
           return;
         }
-  
+
         return accumulator[currentValue].children;
       }, taskItems);
-    })
+    });
   };
 
   const _getTargetTaskPositionBFS = (
     taskItems: TaskType[],
-    taskId: number
+    taskId: number,
   ): number[] => {
     let originNodeAndPosition: [Task, number[]] = [];
     let nextNodeAndPosition: [Task, number[]] = [];
@@ -152,7 +169,7 @@ export default function TaskArea({
 
     while (originNodeAndPosition.length > 0) {
       catchNodePosition = originNodeAndPosition.find(
-        (nodeInfo) => nodeInfo[0].id == taskId
+        (nodeInfo) => nodeInfo[0].id == taskId,
       )?.[1]; // 検索実行
       if (catchNodePosition) break; // 検索引っかかったらwhileを抜ける
 
@@ -174,18 +191,18 @@ export default function TaskArea({
   const storeTasks = async (items) => {
     return await axios.put<TaskType>(
       `http://localhost:3001/api/tasks/bulk`,
-      JSON.stringify(items)
+      JSON.stringify(items),
     );
   };
 
   const deleteTask = async ({ id }: { id: number }) => {
     const response = await axios.delete(
-      `http://localhost:3001/api/tasks/${id}`
+      `http://localhost:3001/api/tasks/${id}`,
     );
     if (response.status === 200) {
       const exclusionTaskItems = _.filter(
         taskItems,
-        (taskItem) => taskItem.id !== id
+        (taskItem) => taskItem.id !== id,
       );
       setTaskItems(exclusionTaskItems);
     }
@@ -201,36 +218,29 @@ export default function TaskArea({
 
   return (
     <>
-      { !!pathParameterTaskId ||
-        <div style={{marginTop: "30px"}}>
-          <FormControl sx={{width: "200px"}}>
+      {!!pathParameterTaskId || (
+        <div style={{ marginTop: "30px" }}>
+          <FormControl sx={{ width: "200px" }}>
             <InputLabel id="search-tickets-label">チケット検索</InputLabel>
-              
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  defaultValue={selectSearchTicketId　|| "unclassified"}
-                  label="ticket"
-                  onChange={(e) => {
-                    localStorage.setItem("selectSearchTicketId", e.target.value)
-                    setSelectSearchTicketId(e.target.value)
-                  }}
-                >
-              
-              <MenuItem
-                key={null}
-                value={"unclassified"}
-              >
+
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              defaultValue={selectSearchTicketId || "unclassified"}
+              label="ticket"
+              onChange={(e) => {
+                localStorage.setItem("selectSearchTicketId", e.target.value);
+                setSelectSearchTicketId(e.target.value);
+              }}
+            >
+              <MenuItem key={null} value={"unclassified"}>
                 未分類
               </MenuItem>
               {/* TODO: ticketsはstoreで状態管理させる */}
               {ticketItems.map((ticket) => {
                 return (
                   ticket.status != Statuses.Done && (
-                    <MenuItem
-                      key={ticket.id}
-                      value={ticket.id}
-                    >
+                    <MenuItem key={ticket.id} value={ticket.id}>
                       {ticket.title}
                     </MenuItem>
                   )
@@ -239,7 +249,7 @@ export default function TaskArea({
             </Select>
           </FormControl>
         </div>
-      }
+      )}
       {taskItems && (
         <Nestable
           items={taskItems}

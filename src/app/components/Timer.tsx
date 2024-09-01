@@ -8,8 +8,8 @@ import notifySound from "./../assets/notify.mp3";
 import restEndSound from "./../assets/rest_end.mp3";
 import styles from "../css/Timer.module.css";
 import { VirtualWindow } from "@react-libraries/virtual-window";
-import VolumeDownIcon from '@mui/icons-material/VolumeDown';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeDownIcon from "@mui/icons-material/VolumeDown";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 let worker = new Worker(new URL("../../libs/secondsTimer.ts", import.meta.url));
 
@@ -18,51 +18,84 @@ const Timer = ({
 }: {
   onTimerUpdate: (number: number) => void;
 }) => {
-  const timer = useRef<any>(null)
-  const isInitialRender = useRef(true)
-  const initializeOperatingSeconds = 25
-  const initializeRestSeconds = 5
-  const [operatingSeconds, setOperatingSeconds] = useState<number>((Number(localStorage.getItem("inputOperatingMinutes")) || initializeOperatingSeconds) * 60 - (localStorage.getItem("isResting") === "true"  ? 0 : Number(localStorage.getItem("sumTime"))));
-  const [restSeconds, setRestSeconds] = useState<number>(Number((localStorage.getItem("inputRestMinutes")) || initializeRestSeconds) * 60 - (localStorage.getItem("isResting") === "true"  ? Number(localStorage.getItem("sumTime")) : 0));
-  const [isResting, setIsResting] = useState(localStorage.getItem("isResting") === "true");
-  const [volume, setVolume] = useState(Number(localStorage.getItem("volume")) || 50)
-  const [operationSoundPlay] = useSound(operationEndSound, { volume: volume / 100 });
+  const timer = useRef<any>(null);
+  const isInitialRender = useRef(true);
+  const initializeOperatingSeconds = 25;
+  const initializeRestSeconds = 5;
+  const [operatingSeconds, setOperatingSeconds] = useState<number>(
+    (Number(localStorage.getItem("inputOperatingMinutes")) ||
+      initializeOperatingSeconds) *
+      60 -
+      (localStorage.getItem("isResting") === "true"
+        ? 0
+        : Number(localStorage.getItem("sumTime"))),
+  );
+  const [restSeconds, setRestSeconds] = useState<number>(
+    Number(localStorage.getItem("inputRestMinutes") || initializeRestSeconds) *
+      60 -
+      (localStorage.getItem("isResting") === "true"
+        ? Number(localStorage.getItem("sumTime"))
+        : 0),
+  );
+  const [isResting, setIsResting] = useState(
+    localStorage.getItem("isResting") === "true",
+  );
+  const [volume, setVolume] = useState(
+    Number(localStorage.getItem("volume")) || 50,
+  );
+  const [operationSoundPlay] = useSound(operationEndSound, {
+    volume: volume / 100,
+  });
   const [restSoundPlay] = useSound(restEndSound, { volume: volume / 100 });
   const [notifySoundPlay] = useSound(notifySound, { volume: volume / 100 });
   const [isInputHidden, setIsInputHidden] = useState(false);
-  const [sumTime, setSumTime] = useState(Number(localStorage.getItem("sumTime")));
-  const [isStarting, setIsStarting] = useState(localStorage.getItem("isStarting") === "true");
-  const [inputOperatingMinutes, setInputOperatingMinutes] = useState(Number(localStorage.getItem("inputOperatingMinutes")) || initializeOperatingSeconds);
-  const [inputRestMinutes, setInputRestMinutes] = useState(Number(localStorage.getItem("inputRestMinutes")) || initializeRestSeconds);
+  const [sumTime, setSumTime] = useState(
+    Number(localStorage.getItem("sumTime")),
+  );
+  const [isStarting, setIsStarting] = useState(
+    localStorage.getItem("isStarting") === "true",
+  );
+  const [inputOperatingMinutes, setInputOperatingMinutes] = useState(
+    Number(localStorage.getItem("inputOperatingMinutes")) ||
+      initializeOperatingSeconds,
+  );
+  const [inputRestMinutes, setInputRestMinutes] = useState(
+    Number(localStorage.getItem("inputRestMinutes")) || initializeRestSeconds,
+  );
 
   useEffect(() => {
-    isInitialRender.current = false
-    if (isStarting) {worker.postMessage("start")}
-  }, [])
+    isInitialRender.current = false;
+    if (isStarting) {
+      worker.postMessage("start");
+    }
+  }, []);
 
   useEffect(() => {
-    if(!isStarting && sumTime >= 0) {
+    if (!isStarting && sumTime >= 0) {
       timer.current = setInterval(() => {
-        notifySoundPlay()
+        notifySoundPlay();
       }, 10000);
     } else {
-      clearInterval(timer.current)
+      clearInterval(timer.current);
     }
     worker.postMessage(["stop", sumTime]);
     localStorage.setItem("isStarting", `${isStarting}`);
-  }, [isStarting])
+  }, [isStarting]);
 
   useEffect(() => {
-    localStorage.setItem("volume", volume.toString())
-  }, [volume])
+    localStorage.setItem("volume", volume.toString());
+  }, [volume]);
 
   useEffect(() => {
-    localStorage.setItem("inputOperatingMinutes", inputOperatingMinutes.toString())
-  }, [inputOperatingMinutes])
+    localStorage.setItem(
+      "inputOperatingMinutes",
+      inputOperatingMinutes.toString(),
+    );
+  }, [inputOperatingMinutes]);
 
   useEffect(() => {
-    localStorage.setItem("inputRestMinutes", inputRestMinutes.toString())
-  }, [inputRestMinutes])
+    localStorage.setItem("inputRestMinutes", inputRestMinutes.toString());
+  }, [inputRestMinutes]);
 
   worker.onmessage = () => {
     localStorage.setItem("sumTime", Number(sumTime));
@@ -92,8 +125,8 @@ const Timer = ({
   }, [sumTime]);
 
   const timerReset = () => {
-    timerPause()
-    setSumTime(0)
+    timerPause();
+    setSumTime(0);
     setTimeout(() => {
       setOperatingSeconds(inputOperatingMinutes * 60);
       setRestSeconds(inputRestMinutes * 60);
@@ -106,7 +139,7 @@ const Timer = ({
   };
 
   const timerStart = async () => {
-    setSumTime(0)
+    setSumTime(0);
     if (!isStarting) {
       worker.postMessage("start");
       setIsStarting(true);
@@ -208,10 +241,22 @@ const Timer = ({
             </div>
           </div>
         )}
-        <Stack spacing={2} direction="row" sx={{ backgroundColor: "white" }} alignItems="center">
-          <VolumeDownIcon/>
-            <Slider style={{backgroundColor: "white"}} aria-label="Volume" value={volume} onChange={(e) => {setVolume(e.target.value)}} />
-          <VolumeUpIcon/>
+        <Stack
+          spacing={2}
+          direction="row"
+          sx={{ backgroundColor: "white" }}
+          alignItems="center"
+        >
+          <VolumeDownIcon />
+          <Slider
+            style={{ backgroundColor: "white" }}
+            aria-label="Volume"
+            value={volume}
+            onChange={(e) => {
+              setVolume(e.target.value);
+            }}
+          />
+          <VolumeUpIcon />
         </Stack>
         <div
           style={{

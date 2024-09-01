@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Task }
+  { params }: { params: Task },
 ): Promise<Promise<unknown>> {
   const prisma = new PrismaClient();
 
@@ -19,14 +19,10 @@ export async function POST(
         parentId: Number(id),
         status: 0,
         type: 0,
-        plans:
-          {create: {}},
-        achievements:
-          {create: {}},
-        checks:
-          {create: {}},
-        feedbacks:
-          {create: {}},
+        plans: { create: {} },
+        achievements: { create: {} },
+        checks: { create: {} },
+        feedbacks: { create: {} },
       },
       include: {
         plans: true,
@@ -63,26 +59,25 @@ export async function POST(
                             achievements: true,
                             checks: true,
                             feedbacks: true,
-                            children: {
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                            children: {},
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     console.log("create child complete");
   } catch (e) {
     console.log("Error: ", e);
     status = 400;
   } finally {
-    prisma.$disconnect()
+    prisma.$disconnect();
     return NextResponse.json(result, { status: status });
   }
 }
