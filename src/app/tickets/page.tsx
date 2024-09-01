@@ -46,7 +46,7 @@ export default function TicketView() {
         const { status, ...others } = ticket;
         const stringStatusCode = _.findKey(
           Statuses,
-          (value) => value === status
+          (value) => value === status,
         );
         return { status: stringStatusCode, ...others };
       });
@@ -55,10 +55,20 @@ export default function TicketView() {
   }, []);
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const deleteTicket = async (ticketId: number) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/tickets/${ticketId}`);
+      console.log(ticketItems);
+      setTicketItems((items) => items.filter((item) => item.id != ticketId));
+    } catch (error) {
+      console.log("Error", error);
+    }
   };
 
   const TicketStatuses = {
@@ -90,7 +100,7 @@ export default function TicketView() {
     title: string,
     url: number,
     numberOfTask: number,
-    totalTime: number
+    totalTime: number,
   ) {
     return { id, status, title, url, numberOfTask, totalTime };
   }
@@ -112,7 +122,7 @@ export default function TicketView() {
           title: title,
           status: TicketStatuses[status],
           url: url,
-        })
+        }),
       );
       const newItem = createData(
         nextId.toString(),
@@ -120,7 +130,7 @@ export default function TicketView() {
         title,
         url,
         0,
-        0
+        0,
       );
       setTicketItems([newItem, ...ticketItems]);
     } catch (e) {
@@ -195,7 +205,13 @@ export default function TicketView() {
                       </Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="contained" color="error">
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={(e) => {
+                          deleteTicket(row.id);
+                        }}
+                      >
                         削除
                       </Button>
                     </TableCell>
