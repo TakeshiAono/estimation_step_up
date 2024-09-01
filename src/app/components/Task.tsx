@@ -341,6 +341,7 @@ const Task = ({
             onChange={(event) => {
               setTitle(event.target.value);
             }}
+            multiline={true}
           />
         </div>
         <div className={styles.operatedTime}>
