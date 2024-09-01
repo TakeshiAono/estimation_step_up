@@ -107,6 +107,11 @@ export async function PATCH(
     const { id } = params;
     const { seconds, plan, check, feedback, achievement, ...other } =
       await request.json();
+    if (other.status === Statuses.Done) {
+      achievement.doneDate = new Date();
+    } else {
+      achievement.doneDate =  null
+    }
     if (achievement.operatingTime > 0 || achievement.surveyTime > 0) {
       other.status = Statuses.Run;
     }

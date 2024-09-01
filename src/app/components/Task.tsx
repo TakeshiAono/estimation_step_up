@@ -21,6 +21,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Statuses, TaskTypes } from "@/app/constants/TaskConstants";
 import type { Task } from "@/schema/zod";
 import TaskModal from "./TaskModal";
+import dayjs from "dayjs";
 
 type Props = {
   seconds: number;
@@ -90,11 +91,11 @@ const Task = ({
   const [taskItems, setTaskItems] = useState<TaskItem[]>([
     { id: 0, title: "", hour: 0 },
   ]);
-  const isInitialRender = useRef(true)
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
-    isInitialRender.current = false
-  }, [])
+    isInitialRender.current = false;
+  }, []);
 
   useEffect(() => {
     if (operatingTaskId == task.id) {
@@ -108,7 +109,7 @@ const Task = ({
 
   useEffect(() => {
     if (!isInitialRender.current) {
-      mutationTask()
+      mutationTask();
     }
   }, [status]);
 
@@ -275,7 +276,7 @@ const Task = ({
           )}
         </div>
         <div style={{ marginLeft: "20px" }}>
-          {(status != Statuses.Done ? (
+          {status != Statuses.Done ? (
             <Button
               variant="contained"
               color="primary"
@@ -295,7 +296,7 @@ const Task = ({
             >
               実施中に戻す
             </Button>
-          ))}
+          )}
           {
             <Button
               variant="contained"
@@ -491,7 +492,13 @@ const Task = ({
             <div className={styles.taskColumn}>
               <InputLabel>完了日</InputLabel>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker label={null} />
+                <DateTimePicker
+                  label={null}
+                  value={
+                    achievements.doneDate ? dayjs(achievements.doneDate) : null
+                  }
+                  disabled={true}
+                />
               </LocalizationProvider>
             </div>
             <div className={styles.taskColumn}>
