@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import TicketModal from "../components/TicketModal";
 import axios from "axios";
+import { Statuses } from "../constants/TaskConstants";
 
 export default function TicketView() {
   const [page, setPage] = useState(0);
@@ -37,10 +38,17 @@ export default function TicketView() {
   useEffect(() => {
     const fetchTickets = async () => {
       const {data} = await axios.get("http://localhost:3001/api/tickets")
-      console.log(data)
       return data.sort((item) => item.id).reverse()
     }
-    fetchTickets().then((reuslt) => {setTicketItems(reuslt)})
+
+    fetchTickets().then((tickets) => {
+      const changedStatusItems = tickets.map(ticket => {
+        const {status, ...others} = ticket
+        const stringStatusCode = _.findKey(Statuses, (value) => value === status)
+        return {status: stringStatusCode, ...others}
+      })
+      setTicketItems(changedStatusItems)
+    })
   }, [])
 
   const handleChangeRowsPerPage = (
