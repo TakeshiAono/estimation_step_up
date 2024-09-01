@@ -26,10 +26,12 @@ export default function TicketView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditTicket, setIsEditTicket] = useState(false);
   const [status, setStatus] = useState("NotYet");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [ticketItems, setTicketItems] = useState<any>([]);
+  const [editTicketItem, setEditTicketItem] = useState<any>([]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -66,6 +68,26 @@ export default function TicketView() {
       await axios.delete(`http://localhost:3001/api/tickets/${ticketId}`);
       console.log(ticketItems);
       setTicketItems((items) => items.filter((item) => item.id != ticketId));
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+
+  const editTicket = async () => {
+    try {
+      await axios.put(
+        `http://localhost:3001/api/tickets/${editTicketItem.id}`,
+        { ...editTicketItem, status: Statuses[editTicketItem.status] },
+      );
+      setTicketItems((items) =>
+        items.map((item) => {
+          if (item.id == editTicketItem.id) {
+            return editTicketItem;
+          } else {
+            return item;
+          }
+        }),
+      );
     } catch (error) {
       console.log("Error", error);
     }
@@ -200,7 +222,15 @@ export default function TicketView() {
                       );
                     })}
                     <TableCell>
-                      <Button variant="contained" color="success">
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => {
+                          setIsEditTicket(true);
+                          setIsModalOpen(true);
+                          setEditTicketItem(row);
+                        }}
+                      >
                         編集
                       </Button>
                     </TableCell>
@@ -230,47 +260,110 @@ export default function TicketView() {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-
-      <TicketModal
-        onSuccess={createTicket}
-        isOpen={isModalOpen}
-        onCloseModal={closeModal}
-      >
-        <FormControl
-          variant={"filled"}
-          sx={{
-            mt: 2,
-            minWidth: 120,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 5, // 子要素間にスペースを持たせる
+      {isEditTicket ? (
+        <TicketModal
+          onSuccess={editTicket}
+          isOpen={isModalOpen}
+          onCloseModal={() => {
+            setIsEditTicket(false);
+            closeModal();
           }}
+          title={"チケット編集"}
+          description={"編集するチケットの情報を入力してください"}
         >
-          <TextField
-            label="タイトル"
-            variant="outlined"
-            onChange={(e) => {
-              setTitle(e.target.value);
+          <FormControl
+            variant={"filled"}
+            sx={{
+              mt: 2,
+              minWidth: 120,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              gap: 5, // 子要素間にスペースを持たせる
             }}
-          />
-          <FormControl variant="outlined" sx={{ minWidth: 120 }}>
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
-            <Select value={status} label={"Status"} onChange={changeStatusId}>
-              <MenuItem value={"NotYet"}>未実施</MenuItem>
-              <MenuItem value={"Run"}>実行中</MenuItem>
-              <MenuItem value={"Done"}>完了</MenuItem>
-            </Select>
+          >
+            <TextField
+              label="タイトル"
+              variant="outlined"
+              value={editTicketItem.title}
+              onChange={(e) => {
+                setEditTicketItem((ticketItem) => {
+                  return { ...ticketItem, title: e.target.value };
+                });
+              }}
+            />
+            <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+              <InputLabel id="demo-simple-select-label">Status</InputLabel>
+              <Select
+                value={editTicketItem.status}
+                label={"Status"}
+                onChange={(e) => {
+                  setEditTicketItem((ticketItem) => {
+                    return { ...ticketItem, status: e.target.value };
+                  });
+                }}
+              >
+                <MenuItem value={"NotYet"}>未実施</MenuItem>
+                <MenuItem value={"Run"}>実行中</MenuItem>
+                <MenuItem value={"Done"}>完了</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="URL"
+              variant="outlined"
+              value={editTicketItem.url}
+              onChange={(e) => {
+                setEditTicketItem((ticketItem) => {
+                  return { ...ticketItem, url: e.target.value };
+                });
+              }}
+            />
           </FormControl>
-          <TextField
-            label="URL"
-            variant="outlined"
-            onChange={(e) => {
-              setUrl(e.target.value);
+        </TicketModal>
+      ) : (
+        <TicketModal
+          onSuccess={createTicket}
+          isOpen={isModalOpen}
+          onCloseModal={closeModal}
+          title={"チケット新規作成"}
+          description={"作成するチケットの情報を入力してください"}
+        >
+          <FormControl
+            variant={"filled"}
+            sx={{
+              mt: 2,
+              minWidth: 120,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              gap: 5, // 子要素間にスペースを持たせる
             }}
-          />
-        </FormControl>
-      </TicketModal>
+          >
+            <TextField
+              label="タイトル"
+              variant="outlined"
+              onChange={(e) => {
+                setTitle(e.target.value);
+              }}
+            />
+            <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+              <InputLabel id="demo-simple-select-label">Status</InputLabel>
+              <Select value={status} label={"Status"} onChange={changeStatusId}>
+                <MenuItem value={"NotYet"}>未実施</MenuItem>
+                <MenuItem value={"Run"}>実行中</MenuItem>
+                <MenuItem value={"Done"}>完了</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="URL"
+              variant="outlined"
+              onChange={(e) => {
+                setUrl(e.target.value);
+              }}
+            />
+          </FormControl>
+        </TicketModal>
+      )}
     </>
   );
 }

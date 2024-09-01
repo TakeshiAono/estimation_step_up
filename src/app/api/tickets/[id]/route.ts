@@ -37,6 +37,7 @@ export async function PUT(
     });
     console.log("update complete");
   } catch (e) {
+    console.log("Error", e);
     status = 400;
   } finally {
     prisma.$disconnect();

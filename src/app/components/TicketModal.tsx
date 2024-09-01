@@ -16,7 +16,14 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
-const TicketModal = ({ onSuccess, isOpen, onCloseModal, children }) => {
+const TicketModal = ({
+  onSuccess,
+  isOpen,
+  onCloseModal,
+  children,
+  title,
+  description,
+}) => {
   const [open, setOpen] = useState(false);
   const [fullWidth, setFullWidth] = useState(true);
 
@@ -40,11 +47,9 @@ const TicketModal = ({ onSuccess, isOpen, onCloseModal, children }) => {
         open={open}
         onClose={onCloseModal}
       >
-        <DialogTitle>チケット新規作成</DialogTitle>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            作成するチケットの情報を入力してください
-          </DialogContentText>
+          <DialogContentText>{description}</DialogContentText>
           {children}
         </DialogContent>
         <div style={{ display: "flex", justifyContent: "end" }}>
@@ -62,7 +67,7 @@ const TicketModal = ({ onSuccess, isOpen, onCloseModal, children }) => {
                 onCloseModal();
               }}
             >
-              作成
+              登録
             </Button>
           </DialogActions>
         </div>
