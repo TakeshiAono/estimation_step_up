@@ -120,11 +120,9 @@ const Task = ({
   };
 
   useEffect(() => {
-    if (status === Statuses.Run) {
-      if (operatingTime % 60 === 1 || surveyTime % 60 === 1) {
-        //NOTE:1分ごとに自動保存されるようにする。
-        updateTime();
-      }
+    if (operatingTime % 60 === 1 || surveyTime % 60 === 1) {
+      //NOTE:1分ごとに自動保存されるようにする。
+      updateTime();
     }
   }, [operatingTime, surveyTime]);
 
