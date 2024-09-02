@@ -130,8 +130,9 @@ const Task = ({
     return await axios.patch(
       `http://localhost:3001/api/tasks/${task.id}/time`,
       {
-        surveyTime: surveyTime,
-        operatingTime: operatingTime,
+        // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
+        surveyTime: surveyTime + 1,
+        operatingTime: operatingTime + 1,
       },
     );
   };
