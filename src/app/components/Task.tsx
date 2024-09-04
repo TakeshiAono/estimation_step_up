@@ -91,6 +91,7 @@ const Task = ({
   const [taskItems, setTaskItems] = useState<TaskItem[]>([
     { id: 0, title: "", hour: 0 },
   ]);
+
   const isInitialRender = useRef(true);
 
   useEffect(() => {
@@ -330,6 +331,7 @@ const Task = ({
               value={false}
               label="実装中"
               variant="outlined"
+              disabled={!predictionRequiredTimeOfFirst}
               onChange={() => {
                 mutationTask();
                 setIsSurveyTask(false);
