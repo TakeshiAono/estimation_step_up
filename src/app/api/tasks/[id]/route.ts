@@ -110,9 +110,12 @@ export async function PATCH(
     if (other.status === Statuses.Done) {
       achievement.doneDate = new Date();
     } else {
-      achievement.doneDate =  null
+      achievement.doneDate = null;
     }
-    if (other.status === Statuses.NotYet && (achievement.operatingTime > 0 || achievement.surveyTime > 0)) {
+    if (
+      other.status === Statuses.NotYet &&
+      (achievement.operatingTime > 0 || achievement.surveyTime > 0)
+    ) {
       other.status = Statuses.Run;
     }
     const data = { updatedAt: new Date(), ...other };
