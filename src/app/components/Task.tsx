@@ -22,6 +22,7 @@ import { Statuses, TaskTypes } from "@/app/constants/TaskConstants";
 import type { Task } from "@/schema/zod";
 import TaskModal from "./TaskModal";
 import dayjs from "dayjs";
+import TaskOperationMessage from "./TaskOperationMessage";
 
 type Props = {
   seconds: number;
@@ -178,8 +179,13 @@ const Task = ({
           : { backgroundColor: "lightgray" }
       }
     >
+      <TaskOperationMessage
+        isSurveyTerm={isSurveyTask}
+        isPredictionRequiredTimeOfFirst={!!predictionRequiredTimeOfFirst}
+        isSelectedTicket={!!ticketId}
+      />
       {!!task.parentId || (
-        <div className={styles.inputBlock} style={{ height: "50px" }}>
+        <div className={styles.inputBlock} style={{ marginBottom: "10px" }}>
           <span style={{ marginLeft: "10px" }}>チケット: </span>
           <Select
             disabled={!isEditing}
