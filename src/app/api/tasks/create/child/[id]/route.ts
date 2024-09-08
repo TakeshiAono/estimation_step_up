@@ -20,7 +20,13 @@ export async function POST(
         status: 0,
         type: 0,
         plans: { create: {} },
-        achievements: { create: {} },
+        achievements: {
+          create: {
+            histories: {
+              create: {}
+            }
+          }
+        },
         checks: { create: {} },
         feedbacks: { create: {} },
       },

@@ -27,7 +27,11 @@ export async function GET(
       },
       include: {
         plans: true,
-        achievements: true,
+        achievements: {
+          include: {
+            histories: true
+          }
+        },
         checks: true,
         feedbacks: true,
         children: {
@@ -38,7 +42,11 @@ export async function GET(
           },
           include: {
             plans: true,
-            achievements: true,
+            achievements: {
+              include: {
+                histories: true
+              }
+            },
             checks: true,
             feedbacks: true,
             children: {
@@ -49,7 +57,11 @@ export async function GET(
               },
               include: {
                 plans: true,
-                achievements: true,
+                achievements: {
+                  include: {
+                    histories: true
+                  }
+                },
                 checks: true,
                 feedbacks: true,
                 children: {
@@ -60,7 +72,11 @@ export async function GET(
                   },
                   include: {
                     plans: true,
-                    achievements: true,
+                    achievements: {
+                      include: {
+                        histories: true
+                      }
+                    },
                     checks: true,
                     feedbacks: true,
                     children: {
@@ -71,7 +87,11 @@ export async function GET(
                       },
                       include: {
                         plans: true,
-                        achievements: true,
+                        achievements: {
+                          include: {
+                            histories: true
+                          }
+                        },
                         checks: true,
                         feedbacks: true,
                         children: {
@@ -82,7 +102,11 @@ export async function GET(
                           },
                           include: {
                             plans: true,
-                            achievements: true,
+                            achievements: {
+                              include: {
+                                histories: true
+                              }
+                            },
                             checks: true,
                             feedbacks: true,
                             children: {},

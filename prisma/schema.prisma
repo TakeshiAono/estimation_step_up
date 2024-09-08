@@ -66,6 +66,19 @@ model Achievement {
   operatingTime Int?      @map("operating_time")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
+  histories     History[]
+}
+
+model History {
+  // TODO: isActiveはいらないかも
+  id            Int         @id @default(autoincrement())
+  isActive      Boolean     @default(true)
+  achivementId  Int         @map("achivement_id")
+  achievement   Achievement? @relation(fields: [achivementId], references: [id], onDelete: Cascade)
+  surveyTime    Int?        @map("survey_time")
+  operatingTime Int?        @map("operating_time")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 }
 
 model Check {

@@ -20,6 +20,8 @@ export const PlanScalarFieldEnumSchema = z.enum(['id','taskId','predictionRequir
 
 export const AchievementScalarFieldEnumSchema = z.enum(['id','isDone','taskId','doneDate','surveyTime','operatingTime','createdAt','updatedAt']);
 
+export const HistoryScalarFieldEnumSchema = z.enum(['id','isActive','achivementId','surveyTime','operatingTime','createdAt','updatedAt']);
+
 export const CheckScalarFieldEnumSchema = z.enum(['id','taskId','analysis','createdAt','updatedAt']);
 
 export const FeedbackScalarFieldEnumSchema = z.enum(['id','taskId','issues','improvements','createdAt','updatedAt']);
@@ -158,12 +160,43 @@ export type Achievement = z.infer<typeof AchievementSchema>
 
 export type AchievementRelations = {
   task: TaskWithRelations;
+  histories: HistoryWithRelations[];
 };
 
 export type AchievementWithRelations = z.infer<typeof AchievementSchema> & AchievementRelations
 
 export const AchievementWithRelationsSchema: z.ZodType<AchievementWithRelations> = AchievementSchema.merge(z.object({
   task: z.lazy(() => TaskWithRelationsSchema),
+  histories: z.lazy(() => HistoryWithRelationsSchema).array(),
+}))
+
+/////////////////////////////////////////
+// HISTORY SCHEMA
+/////////////////////////////////////////
+
+export const HistorySchema = z.object({
+  id: z.number().int(),
+  isActive: z.boolean(),
+  achivementId: z.number().int(),
+  surveyTime: z.number().int().nullable(),
+  operatingTime: z.number().int().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type History = z.infer<typeof HistorySchema>
+
+// HISTORY RELATION SCHEMA
+//------------------------------------------------------
+
+export type HistoryRelations = {
+  achievement?: AchievementWithRelations | null;
+};
+
+export type HistoryWithRelations = z.infer<typeof HistorySchema> & HistoryRelations
+
+export const HistoryWithRelationsSchema: z.ZodType<HistoryWithRelations> = HistorySchema.merge(z.object({
+  achievement: z.lazy(() => AchievementWithRelationsSchema).nullable(),
 }))
 
 /////////////////////////////////////////

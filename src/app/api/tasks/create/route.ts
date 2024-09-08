@@ -20,7 +20,11 @@ export async function POST(
           create: {},
         },
         achievements: {
-          create: {},
+          create: {
+            histories:{
+              create: {}
+            }
+          },
         },
         checks: {
           create: {},
@@ -37,31 +41,51 @@ export async function POST(
         children: {
           include: {
             plans: true,
-            achievements: true,
+            achievements: {
+              include: {
+                histories: true
+              }
+            },
             checks: true,
             feedbacks: true,
             children: {
               include: {
                 plans: true,
-                achievements: true,
+                achievements: {
+                  include: {
+                    histories: true
+                  }
+                },
                 checks: true,
                 feedbacks: true,
                 children: {
                   include: {
                     plans: true,
-                    achievements: true,
+                    achievements: {
+                      include: {
+                        histories: true
+                      }
+                    },
                     checks: true,
                     feedbacks: true,
                     children: {
                       include: {
                         plans: true,
-                        achievements: true,
+                        achievements: {
+                          include: {
+                            histories: true
+                          }
+                        },
                         checks: true,
                         feedbacks: true,
                         children: {
                           include: {
                             plans: true,
-                            achievements: true,
+                            achievements: {
+                              include: {
+                                histories: true
+                              }
+                            },
                             checks: true,
                             feedbacks: true,
                             children: {},

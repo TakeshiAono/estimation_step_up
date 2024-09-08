@@ -29,7 +29,13 @@ export async function POST(
                 predictionRequiredTimeOfFirst: Number(taskItem.hour),
               },
             },
-            achievements: { create: {} },
+            achievements: {
+              create: {
+                histories:{
+                  create: {}
+                }
+              }
+            },
             checks: { create: {} },
             feedbacks: { create: {} },
           },
