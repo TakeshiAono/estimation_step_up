@@ -100,10 +100,14 @@ const Task = ({
   ]);
 
   const isInitialRender = useRef(true);
+  const historyCreated = useRef(achievements.histories.filter(history => dayjs(history.createdAt).startOf("day").format().toString() === dayjs().startOf("day").format().toString()).length > 0);
 
   useEffect(() => {
-    isInitialRender.current = false;
-  }, []);
+    if (!isInitialRender.current) {
+      mutationTask();
+    }
+
+  }, [status]);
 
   useEffect(() => {
     if (operatingTaskId == task.id) {
@@ -116,10 +120,22 @@ const Task = ({
   }, [seconds]);
 
   useEffect(() => {
-    if (!isInitialRender.current) {
-      mutationTask();
+    if (operatingTime % 60 === 0 && !isInitialRender.current) {
+      //NOTE:1分ごとに自動保存されるようにする。
+      updateTime();
     }
-  }, [status]);
+  }, [operatingTime]);
+
+  useEffect(() => {
+    if (surveyTime % 60 === 0 && !isInitialRender.current) {
+      //NOTE:1分ごとに自動保存されるようにする。
+      updateTime();
+    }
+  }, [surveyTime]);
+
+  useEffect(() => {
+    if(isInitialRender.current) isInitialRender.current = false;
+  }, []);
 
   const switchOperatingTask = () => {
     operatingTaskId == task.id
@@ -127,31 +143,24 @@ const Task = ({
       : onSelectOperatingTask(task.id);
   };
 
-  useEffect(() => {
-    if (operatingTime % 60 === 1 || surveyTime % 60 === 1) {
-      //NOTE:1分ごとに自動保存されるようにする。
-      updateTime();
-    }
-  }, [operatingTime, surveyTime]);
-
   const updateTime = async () => {
-    const isExistTodayHistory = achievements.histories.filter(history => dayjs(history.createdAt).startOf("day").toString() === dayjs().startOf("day").toString()).length > 0
-    if(isExistTodayHistory) {
+    if(historyCreated.current) {
       return await axios.patch(
         `http://localhost:3001/api/tasks/${task.id}/time`,
         {
           // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
-          surveyTime: surveyTime - pastSurveyTime + 1,
-          operatingTime: operatingTime - pastOperatingTime + 1,
+          surveyTime: surveyTime - pastSurveyTime,
+          operatingTime: operatingTime - pastOperatingTime,
         },
       );
     } else {
+      historyCreated.current = true
       return await axios.post(
         `http://localhost:3001/api/tasks/${task.id}/time`,
         {
           // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
-          surveyTime: surveyTime - pastSurveyTime + 1,
-          operatingTime: operatingTime - pastOperatingTime + 1,
+          surveyTime: surveyTime - pastSurveyTime,
+          operatingTime: operatingTime - pastOperatingTime,
         },
       );
     }
