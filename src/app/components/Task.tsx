@@ -120,14 +120,14 @@ const Task = ({
   }, [seconds]);
 
   useEffect(() => {
-    if (operatingTime % 60 === 0 && !isInitialRender.current) {
+    if (operatingTime % 60 === 1 && !isInitialRender.current) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
     }
   }, [operatingTime]);
 
   useEffect(() => {
-    if (surveyTime % 60 === 0 && !isInitialRender.current) {
+    if (surveyTime % 60 === 1 && !isInitialRender.current) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
     }
