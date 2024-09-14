@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Task from "./Task";
 import _ from "lodash";
 import Nestable from "react-nestable";
@@ -9,6 +9,8 @@ import type { Task as TaskType } from "@/schema/zod";
 import Timer from "./Timer";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { Statuses } from "../constants/TaskConstants";
+import TimeBarChart, { OperatingTaskMinutesMaps } from "./TimeBarChart";
+import dayjs from "dayjs";
 
 type Props = {
   createdTopTask: Task;
@@ -23,6 +25,7 @@ export default function TaskArea({
 }: Props) {
   const [seconds, setSeconds] = useState(0);
   const [taskItems, setTaskItems] = useState<TaskType[]>([]);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isHidden, setIsHidden] = useState(false);
   const [operatingTaskId, setOperatingTaskId] = useState(null);
   const [ticketItems, setTicketItems] = useState<any>([]);
@@ -30,7 +33,15 @@ export default function TaskArea({
     number | null
   >(localStorage.getItem("selectSearchTicketId"));
 
-  // TODO: ticketsはstoreで状態管理させる
+  const [operatingTaskMinutesMaps, setOperatingTaskMinutesMaps] =
+    useState<OperatingTaskMinutesMaps>([]);
+
+  useEffect(() => {
+    if (tasks) {
+      getTaskTermInfos();
+    }
+  }, [tasks]);
+
   useEffect(() => {
     const fetchTickets = async () => {
       const { data } = await axios.get("http://localhost:3001/api/tickets");
@@ -38,19 +49,24 @@ export default function TaskArea({
       return data.sort((item) => item.id).reverse();
     };
 
+    const fetchAllTasks = async () => {
+      return await axios.get(`http://localhost:3001/api/tasks`);
+    };
+
     fetchTickets().then((reuslt) => {
       setTicketItems(() => {
         return reuslt;
       });
     });
-  }, []);
 
-  useEffect(() => {
+    fetchAllTasks().then(({ data }) => {
+      setTasks(data);
+    });
+
     // TODO: パスパラメータがある時とない時のifが複数箇所に記載されているため別フックまたはコンポーネントにまとめる
     if (!pathParameterTaskId) {
       fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then(
         (response: TaskType[]) => {
-          console.log("取得データ", response.data);
           const parentTasks = pathParameterTaskId
             ? response.data
             : response.data.filter((task) => task.parentId === null);
@@ -59,7 +75,6 @@ export default function TaskArea({
       );
     } else {
       fetchChildTask(pathParameterTaskId).then((response: TaskType[]) => {
-        console.log("取得データA", response.data);
         const parentTasks = pathParameterTaskId
           ? response.data
           : response.data.filter((task) => task.parentId === null);
@@ -73,7 +88,6 @@ export default function TaskArea({
     if (!pathParameterTaskId) {
       fetchTasksByTicketId(localStorage.getItem("selectSearchTicketId")).then(
         (response: TaskType[]) => {
-          console.log("取得データ", response.data);
           const parentTasks = pathParameterTaskId
             ? response.data
             : response.data.filter((task) => task.parentId === null);
@@ -82,12 +96,6 @@ export default function TaskArea({
       );
     }
   }, [selectSearchTicketId]);
-
-  const filterTaskItemByTicketId = () => {
-    return taskItems.filter(
-      (taskItem) => taskItem.ticketId === selectSearchTicketId,
-    );
-  };
 
   const renderTask = ({ item }: { item: Task }) => {
     return (
@@ -208,21 +216,63 @@ export default function TaskArea({
     }
   };
 
-  const fetchAllTasks = async () => {
-    return await axios.get(`http://localhost:3001/api/tasks`);
-  };
-
   const fetchChildTask = async (id: string) => {
     return await axios.get(`http://localhost:3001/api/tasks/${id}`);
+  };
+
+  const getTaskTermInfos = async () => {
+    setOperatingTaskMinutesMaps(
+      _.flatten(
+        _.compact(
+          tasks.map((task) => {
+            const extractedTodayTermsByTask =
+              task.operatedTermsJsonForTimeBarChart?.filter((term, index) => {
+                return dayjs(term.start).isSame(dayjs(), "day");
+              });
+
+            let test = null;
+            if (extractedTodayTermsByTask?.length > 0) {
+              test = extractedTodayTermsByTask.map((term) => {
+                return {
+                  taskName: task.title,
+                  start: dayjs(term.start).diff(
+                    dayjs().startOf("day"),
+                    "minutes",
+                  ),
+                  end: dayjs(term.end).diff(dayjs().startOf("day"), "minutes"),
+                  color: term.color,
+                };
+              });
+            }
+            return test;
+          }),
+        ),
+      ),
+    );
   };
 
   return (
     <>
       {!!pathParameterTaskId || (
-        <div style={{ marginTop: "30px" }}>
-          <FormControl sx={{ width: "200px" }}>
+        <div
+          style={{
+            width: "auto",
+            paddingTop: "auto",
+            paddingBottom: "20px",
+            height: "auto",
+            marginTop: "30px",
+            backgroundColor: "white",
+            position: "sticky",
+            top: "50px",
+            opacity: "100%",
+            zIndex: 1,
+            display: "flex",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+          }}
+        >
+          <FormControl sx={{ width: "300px", marginTop: "20px" }}>
             <InputLabel id="search-tickets-label">チケット検索</InputLabel>
-
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
@@ -248,6 +298,12 @@ export default function TaskArea({
               })}
             </Select>
           </FormControl>
+          <div>
+            <TimeBarChart
+              width={800}
+              operatingTaskMinutesMaps={operatingTaskMinutesMaps}
+            />
+          </div>
         </div>
       )}
       {taskItems && (

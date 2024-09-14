@@ -17,23 +17,23 @@ export async function POST(
 
     const task = await prisma.task.findFirst({
       where: {
-        id: Number(id)
-      }
-    })
+        id: Number(id),
+      },
+    });
 
-    let achievement
-    if(task) {
+    let achievement;
+    if (task) {
       achievement = await prisma.achievement.findFirst({
         where: {
-          taskId: task.id
-        }
-      })
+          taskId: task.id,
+        },
+      });
     }
 
-    console.log("レコード0",achievement)
-    console.log("だい",dayjs().startOf('day').toDate())
-    let historyRecord
-    if(achievement) {
+    console.log("レコード0", achievement);
+    console.log("だい", dayjs().startOf("day").toDate());
+    let historyRecord;
+    if (achievement) {
       historyRecord = await prisma.history.create({
         data: {
           isActive: true,
@@ -41,7 +41,7 @@ export async function POST(
           achivementId: achievement.id,
           surveyTime: surveyTime,
           operatingTime: operatingTime,
-        }
+        },
       });
     }
 
@@ -70,27 +70,27 @@ export async function PATCH(
 
     const task = await prisma.task.findFirst({
       where: {
-        id: Number(id)
-      }
-    })
+        id: Number(id),
+      },
+    });
 
-    let achievement
-    if(task) {
+    let achievement;
+    if (task) {
       achievement = await prisma.achievement.findFirst({
         where: {
-          taskId: task.id
-        }
-      })
+          taskId: task.id,
+        },
+      });
     }
 
-    let historyRecord
-    if(achievement) {
+    let historyRecord;
+    if (achievement) {
       historyRecord = await prisma.history.findFirst({
         where: {
           createdAt: {
-            gte: dayjs().startOf('day').toDate(),
+            gte: dayjs().startOf("day").toDate(),
           },
-          achivementId: achievement.id  // 必要なフィールドでフィルタリング
+          achivementId: achievement.id, // 必要なフィールドでフィルタリング
         },
       });
     }
@@ -104,15 +104,15 @@ export async function PATCH(
           histories: {
             update: {
               where: {
-                id: historyRecord.id,  // 特定したIDで更新
+                id: historyRecord.id, // 特定したIDで更新
               },
               data: {
                 surveyTime: surveyTime,
                 operatingTime: operatingTime,
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       });
     }
 

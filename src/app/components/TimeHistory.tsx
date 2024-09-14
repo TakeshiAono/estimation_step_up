@@ -12,7 +12,7 @@ type Props = {
   isChildTask?: boolean;
 };
 
-const TaskMenu = ({
+const TimeHistory = ({
   onCreateTopTask,
   onMinimum,
   isMinimum,
@@ -114,4 +114,4 @@ const TaskMenu = ({
   );
 };
 
-export default TaskMenu;
+export default TimeHistory;

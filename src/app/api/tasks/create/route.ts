@@ -21,9 +21,9 @@ export async function POST(
         },
         achievements: {
           create: {
-            histories:{
-              create: {}
-            }
+            histories: {
+              create: {},
+            },
           },
         },
         checks: {
@@ -43,8 +43,8 @@ export async function POST(
             plans: true,
             achievements: {
               include: {
-                histories: true
-              }
+                histories: true,
+              },
             },
             checks: true,
             feedbacks: true,
@@ -53,8 +53,8 @@ export async function POST(
                 plans: true,
                 achievements: {
                   include: {
-                    histories: true
-                  }
+                    histories: true,
+                  },
                 },
                 checks: true,
                 feedbacks: true,
@@ -63,8 +63,8 @@ export async function POST(
                     plans: true,
                     achievements: {
                       include: {
-                        histories: true
-                      }
+                        histories: true,
+                      },
                     },
                     checks: true,
                     feedbacks: true,
@@ -73,8 +73,8 @@ export async function POST(
                         plans: true,
                         achievements: {
                           include: {
-                            histories: true
-                          }
+                            histories: true,
+                          },
                         },
                         checks: true,
                         feedbacks: true,
@@ -83,8 +83,8 @@ export async function POST(
                             plans: true,
                             achievements: {
                               include: {
-                                histories: true
-                              }
+                                histories: true,
+                              },
                             },
                             checks: true,
                             feedbacks: true,

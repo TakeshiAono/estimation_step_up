@@ -23,6 +23,8 @@ import type { Task } from "@/schema/zod";
 import TaskModal from "./TaskModal";
 import dayjs from "dayjs";
 import TaskOperationMessage from "./TaskOperationMessage";
+import { v4 as uuid } from "uuid";
+import seedrandom from "seedrandom";
 
 type Props = {
   seconds: number;
@@ -65,16 +67,26 @@ const Task = ({
 }: Props) => {
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
-  const [pastOperatingTime, setPastOperatingTime] = useState(achievements.histories.reduce((prev, next) => {
-    return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day") ? prev + next.operatingTime : prev
-  }, 0))
-  const [pastSurveyTime, setPastSurveyTime] = useState(achievements.histories.reduce((prev, next) => {
-    return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day") ? prev + next.surveyTime : prev
-  }, 0));
-  const [operatingTime, setOperatingTime] = useState(
-    achievements.histories.reduce((prev, next) => prev + next.operatingTime, 0)
+  const [pastOperatingTime, setPastOperatingTime] = useState(
+    achievements.histories.reduce((prev, next) => {
+      return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
+        ? prev + next.operatingTime
+        : prev;
+    }, 0),
   );
-  const [surveyTime, setSurveyTime] = useState(achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0));
+  const [pastSurveyTime, setPastSurveyTime] = useState(
+    achievements.histories.reduce((prev, next) => {
+      return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
+        ? prev + next.surveyTime
+        : prev;
+    }, 0),
+  );
+  const [operatingTime, setOperatingTime] = useState(
+    achievements.histories.reduce((prev, next) => prev + next.operatingTime, 0),
+  );
+  const [surveyTime, setSurveyTime] = useState(
+    achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0),
+  );
   const [isEditing, setIsEditing] = useState(false);
   // const [ticketItems, setTicketItems] = useState<any>([]);
   const [status, setStatus] = useState(task.status);
@@ -100,13 +112,19 @@ const Task = ({
   ]);
 
   const isInitialRender = useRef(true);
-  const historyCreated = useRef(achievements.histories.filter(history => dayjs(history.createdAt).startOf("day").format().toString() === dayjs().startOf("day").format().toString()).length > 0);
+  const historyCreated = useRef(
+    achievements.histories.filter(
+      (history) =>
+        dayjs(history.createdAt).startOf("day").format().toString() ===
+        dayjs().startOf("day").format().toString(),
+    ).length > 0,
+  );
+  const taskTermId = useRef(uuid());
 
   useEffect(() => {
     if (!isInitialRender.current) {
       mutationTask();
     }
-
   }, [status]);
 
   useEffect(() => {
@@ -123,6 +141,7 @@ const Task = ({
     if (operatingTime % 60 === 1 && !isInitialRender.current) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
+      saveTermForBarChart();
     }
   }, [operatingTime]);
 
@@ -130,12 +149,22 @@ const Task = ({
     if (surveyTime % 60 === 1 && !isInitialRender.current) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
+      saveTermForBarChart();
     }
   }, [surveyTime]);
 
   useEffect(() => {
-    if(isInitialRender.current) isInitialRender.current = false;
+    if (isInitialRender.current) isInitialRender.current = false;
   }, []);
+
+  const saveTermForBarChart = async () => {
+    // FIXME: TaskテーブルにoperatingTermJsonみたいな[{operatingDate: 日付, start: 100, end: 200},{operatingDate: 日付, start: 300, end: 400}]カラムを作り配列形式で保存する。そのデータをchartの中のデータを作成する
+    await axios.post(`http://localhost:3001/api/tasks/${task.id}/term`, {
+      taskTermId: taskTermId.current,
+    });
+    console.log("Save Start Time Complete");
+    // }
+  };
 
   const switchOperatingTask = () => {
     operatingTaskId == task.id
@@ -144,7 +173,7 @@ const Task = ({
   };
 
   const updateTime = async () => {
-    if(historyCreated.current) {
+    if (historyCreated.current) {
       return await axios.patch(
         `http://localhost:3001/api/tasks/${task.id}/time`,
         {
@@ -154,7 +183,7 @@ const Task = ({
         },
       );
     } else {
-      historyCreated.current = true
+      historyCreated.current = true;
       return await axios.post(
         `http://localhost:3001/api/tasks/${task.id}/time`,
         {
@@ -196,6 +225,8 @@ const Task = ({
       },
     });
   };
+
+  const originRandomConst = seedrandom(task.id)();
 
   return (
     <div
@@ -260,7 +291,11 @@ const Task = ({
               <Button
                 variant="contained"
                 color="error"
-                onClick={switchOperatingTask}
+                onClick={() => {
+                  switchOperatingTask();
+                  saveTermForBarChart();
+                  taskTermId.current = uuid();
+                }}
               >
                 作業終了
               </Button>
@@ -268,7 +303,11 @@ const Task = ({
               <Button
                 variant="contained"
                 color="success"
-                onClick={switchOperatingTask}
+                onClick={() => {
+                  switchOperatingTask();
+                  saveTermForBarChart();
+                  taskTermId.current = uuid();
+                }}
               >
                 作業開始
               </Button>

@@ -23,9 +23,9 @@ export async function POST(
         achievements: {
           create: {
             histories: {
-              create: {}
-            }
-          }
+              create: {},
+            },
+          },
         },
         checks: { create: {} },
         feedbacks: { create: {} },

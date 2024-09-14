@@ -16,10 +16,16 @@ export async function GET(
     ticketId = request.nextUrl.searchParams.get("ticketId");
   }
 
+  // NOTE: クエリパラメータが存在している場合に対応
+  let ticketIdObject = null;
+  if (ticketId) {
+    ticketIdObject = { ticketId: Number(ticketId) };
+  }
+
   try {
     tasks = await prisma.task.findMany({
       where: {
-        ticketId: Number(ticketId),
+        ...ticketIdObject,
         parentId: null,
         status: {
           not: Statuses.Done,
@@ -29,8 +35,8 @@ export async function GET(
         plans: true,
         achievements: {
           include: {
-            histories: true
-          }
+            histories: true,
+          },
         },
         checks: true,
         feedbacks: true,
@@ -44,8 +50,8 @@ export async function GET(
             plans: true,
             achievements: {
               include: {
-                histories: true
-              }
+                histories: true,
+              },
             },
             checks: true,
             feedbacks: true,
@@ -59,8 +65,8 @@ export async function GET(
                 plans: true,
                 achievements: {
                   include: {
-                    histories: true
-                  }
+                    histories: true,
+                  },
                 },
                 checks: true,
                 feedbacks: true,
@@ -74,8 +80,8 @@ export async function GET(
                     plans: true,
                     achievements: {
                       include: {
-                        histories: true
-                      }
+                        histories: true,
+                      },
                     },
                     checks: true,
                     feedbacks: true,
@@ -89,8 +95,8 @@ export async function GET(
                         plans: true,
                         achievements: {
                           include: {
-                            histories: true
-                          }
+                            histories: true,
+                          },
                         },
                         checks: true,
                         feedbacks: true,
@@ -104,8 +110,8 @@ export async function GET(
                             plans: true,
                             achievements: {
                               include: {
-                                histories: true
-                              }
+                                histories: true,
+                              },
                             },
                             checks: true,
                             feedbacks: true,

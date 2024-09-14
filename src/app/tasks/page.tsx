@@ -11,13 +11,13 @@ export default function TaskView() {
   const [isMinimum, setIsMinimum] = useState(true);
 
   return (
-    <>
+    <div style={{ width: "100%" }}>
       <TaskMenu
         onCreateTopTask={setNewTaskItem}
         onMinimum={setIsMinimum}
         isMinimum={isMinimum}
       />
       <TaskArea createdTopTask={newTaskItem} isMinimum={isMinimum} />
-    </>
+    </div>
   );
 }

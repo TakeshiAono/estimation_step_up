@@ -25,22 +25,23 @@ model Ticket {
 }
 
 model Task {
-  id           Int           @id @default(autoincrement())
-  isSurveyTask Boolean       @default(true)
-  ticket       Ticket?       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  ticketId     Int?          @map("ticket_id")
-  status       Int
-  type         Int
-  title        String?
-  plans        Plan[]
-  parent       Task?         @relation("children", fields: [parentId], references: [id])
-  parentId     Int?          @map("parent_id")
-  children     Task[]        @relation("children")
-  achievements Achievement[]
-  checks       Check[]
-  feedbacks    Feedback[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id                               Int           @id @default(autoincrement())
+  isSurveyTask                     Boolean       @default(true)
+  ticket                           Ticket?       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  operatedTermsJsonForTimeBarChart Json?         @map("operated_terms_json_for_time_bar_chart")
+  ticketId                         Int?          @map("ticket_id")
+  status                           Int
+  type                             Int
+  title                            String?
+  plans                            Plan[]
+  parent                           Task?         @relation("children", fields: [parentId], references: [id])
+  parentId                         Int?          @map("parent_id")
+  children                         Task[]        @relation("children")
+  achievements                     Achievement[]
+  checks                           Check[]
+  feedbacks                        Feedback[]
+  createdAt                        DateTime      @default(now()) @map("created_at")
+  updatedAt                        DateTime      @updatedAt @map("updated_at")
 }
 
 model Plan {
@@ -71,14 +72,14 @@ model Achievement {
 
 model History {
   // TODO: isActiveはいらないかも
-  id            Int         @id @default(autoincrement())
-  isActive      Boolean     @default(true)
-  achivementId  Int         @map("achivement_id")
+  id            Int          @id @default(autoincrement())
+  isActive      Boolean      @default(true)
+  achivementId  Int          @map("achivement_id")
   achievement   Achievement? @relation(fields: [achivementId], references: [id], onDelete: Cascade)
-  surveyTime    Int?        @map("survey_time")
-  operatingTime Int?        @map("operating_time")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  surveyTime    Int?         @map("survey_time")
+  operatingTime Int?         @map("operating_time")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
 }
 
 model Check {

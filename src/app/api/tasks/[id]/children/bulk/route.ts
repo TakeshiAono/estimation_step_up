@@ -31,10 +31,10 @@ export async function POST(
             },
             achievements: {
               create: {
-                histories:{
-                  create: {}
-                }
-              }
+                histories: {
+                  create: {},
+                },
+              },
             },
             checks: { create: {} },
             feedbacks: { create: {} },

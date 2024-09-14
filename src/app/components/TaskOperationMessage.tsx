@@ -16,31 +16,30 @@ const TaskOperationMessage = ({
     emptyPredictionSurveyTimeOfFirst: {
       message: "初回完了予想時間が未入力です。",
       messageType: "warning",
-      display: true
+      display: true,
     },
     notSelectedTicket: {
       message: "チケットが選択されていません。",
       messageType: "warning",
-      display: true
+      display: true,
     },
     leakTaskNotify: {
       message:
         "調査漏れがあれば子タスクを追加し、その子タスクのタスク種別をリークタスクにしてください",
       messageType: "info",
-      display: true
+      display: true,
     },
     noAlert: {
-      message:
-        "",
+      message: "",
       messageType: "",
-      display: false
-    }
+      display: false,
+    },
   };
 
   const selectDisplayContent = (): {
     message: string;
     messageType: "success" | "info" | "warning" | "error";
-    display: boolean
+    display: boolean;
   } => {
     // if (!isSelectedTicket) {
     //   return MessageMap.notSelectedTicket;
@@ -59,14 +58,14 @@ const TaskOperationMessage = ({
 
   return (
     <>
-      {selectDisplayContent().display &&
+      {selectDisplayContent().display && (
         <Alert
           severity={selectDisplayContent().messageType}
           sx={{ width: "fit-content", marginBottom: "10px" }}
         >
           <span>{selectDisplayContent().message}</span>
         </Alert>
-      }
+      )}
     </>
   );
 };
