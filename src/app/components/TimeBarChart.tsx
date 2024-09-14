@@ -32,6 +32,7 @@ const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
         return [
           operatingTaskMinutesMaps[index].taskName,
           operatingTaskMinutesMaps[index].color,
+          operatingTaskMinutesMaps[index].jumpUrl,
         ];
       } else {
       }
@@ -67,7 +68,7 @@ const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
               key={index}
               onClick={() => {
                 targetTaskInfoOfCurrentMinutes(index)[1] != "white"
-                  ? (window.location.href = "http://localhost:3001/tasks")
+                  ? (window.location.href = targetTaskInfoOfCurrentMinutes(index)[2])
                   : "";
               }}
               style={{

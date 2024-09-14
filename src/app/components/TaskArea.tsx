@@ -241,6 +241,7 @@ export default function TaskArea({
                   ),
                   end: dayjs(term.end).diff(dayjs().startOf("day"), "minutes"),
                   color: term.color,
+                  jumpUrl: `http://localhost:3001/tasks/${task.id}`
                 };
               });
             }
@@ -299,6 +300,7 @@ export default function TaskArea({
             </Select>
           </FormControl>
           <div>
+            {/* {JSON.stringify(operatingTaskMinutesMaps)} */}
             <TimeBarChart
               width={800}
               operatingTaskMinutesMaps={operatingTaskMinutesMaps}
