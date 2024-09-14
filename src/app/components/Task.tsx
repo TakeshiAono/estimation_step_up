@@ -68,24 +68,32 @@ const Task = ({
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
   const [pastOperatingTime, setPastOperatingTime] = useState(
-    achievements.histories.reduce((prev, next) => {
-      return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
-        ? prev + next.operatingTime
-        : prev;
-    }, 0),
+    (achievements.histories &&
+      achievements.histories.reduce((prev, next) => {
+        return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
+          ? prev + next.operatingTime
+          : prev;
+      }, 0)
+    )
   );
   const [pastSurveyTime, setPastSurveyTime] = useState(
-    achievements.histories.reduce((prev, next) => {
-      return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
-        ? prev + next.surveyTime
-        : prev;
-    }, 0),
+    (achievements.histories &&
+      achievements.histories.reduce((prev, next) => {
+        return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
+          ? prev + next.surveyTime
+          : prev;
+      }, 0)
+    )
   );
   const [operatingTime, setOperatingTime] = useState(
-    achievements.histories.reduce((prev, next) => prev + next.operatingTime, 0),
+    (achievements.histories &&
+      achievements.histories.reduce((prev, next) => prev + next.operatingTime, 0)
+    )
   );
   const [surveyTime, setSurveyTime] = useState(
-    achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0),
+    (achievements.histories &&
+      achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0)
+    )
   );
   const [isEditing, setIsEditing] = useState(false);
   // const [ticketItems, setTicketItems] = useState<any>([]);
@@ -113,7 +121,7 @@ const Task = ({
 
   const isInitialRender = useRef(true);
   const historyCreated = useRef(
-    achievements.histories.filter(
+    achievements.histories?.filter(
       (history) =>
         dayjs(history.createdAt).startOf("day").format().toString() ===
         dayjs().startOf("day").format().toString(),
