@@ -128,6 +128,8 @@ const Task = ({
     ).length > 0,
   );
   const taskTermId = useRef(uuid());
+  const isOperatingTask = operatingTaskId == task.id
+  const terms = useRef(task.operatedTermsJsonForTimeBarChart?.filter(term => dayjs(term.start).startOf("day").toString() === dayjs().startOf("day").toString() && dayjs(term.start).toString() !== dayjs(term.end).toString()))
 
   useEffect(() => {
     if (!isInitialRender.current) {
@@ -146,7 +148,7 @@ const Task = ({
   }, [seconds]);
 
   useEffect(() => {
-    if (operatingTime % 60 === 1 && !isInitialRender.current) {
+    if (operatingTime % 60 === 1 && !isInitialRender.current && isOperatingTask) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
       saveTermForBarChart();
@@ -154,7 +156,7 @@ const Task = ({
   }, [operatingTime]);
 
   useEffect(() => {
-    if (surveyTime % 60 === 1 && !isInitialRender.current) {
+    if (surveyTime % 60 === 1 && !isInitialRender.current && isOperatingTask) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
       saveTermForBarChart();

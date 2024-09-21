@@ -300,7 +300,6 @@ export default function TaskArea({
             </Select>
           </FormControl>
           <div>
-            {/* {JSON.stringify(operatingTaskMinutesMaps)} */}
             <TimeBarChart
               width={800}
               operatingTaskMinutesMaps={operatingTaskMinutesMaps}

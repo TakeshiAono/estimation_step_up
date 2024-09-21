@@ -18,16 +18,17 @@ export type OperatingTaskMinutesMaps = {
 const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
   const dayMinutes = 1440;
 
-  const targetTaskInfoOfCurrentMinutes = (currentMinutes: number) => {
+  const currentSpanParamsForMinutes = (minutes: number) => {
     const index = operatingTaskMinutesMaps?.findIndex(
-      (operatingTaskMinutesMap) =>
-        operatingTaskMinutesMap.start <= currentMinutes &&
-        currentMinutes <= operatingTaskMinutesMap.end,
+      (operatingTaskMinutesMap) => {
+        console.log()
+        return operatingTaskMinutesMap.start <= minutes && minutes <= operatingTaskMinutesMap.end
+      }
     );
-    if (index && index != -1) {
+    if (index != -1) {
       if (
-        operatingTaskMinutesMaps[index].start <= currentMinutes &&
-        currentMinutes <= operatingTaskMinutesMaps[index].end
+        operatingTaskMinutesMaps[index].start <= minutes &&
+        minutes <= operatingTaskMinutesMaps[index].end
       ) {
         return [
           operatingTaskMinutesMaps[index].taskName,
@@ -51,47 +52,49 @@ const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
   };
 
   return (
-    <div
-      style={{
-        marginTop: "20px",
-        height: "50px",
-        width: width + "px",
-        border: "solid",
-        display: "grid",
-        gridTemplateColumns: `repeat(${dayMinutes}, 1fr)`,
-      }}
-    >
-      {[...Array(dayMinutes)].map((value, index) => {
-        return (
-          <Tooltip title={targetTaskInfoOfCurrentMinutes(index)[0]}>
-            <div
-              key={index}
-              onClick={() => {
-                targetTaskInfoOfCurrentMinutes(index)[1] != "white"
-                  ? (window.location.href = targetTaskInfoOfCurrentMinutes(index)[2])
-                  : "";
-              }}
-              style={{
-                backgroundColor: targetTaskInfoOfCurrentMinutes(index)[1],
-                width: "auto",
-                position: "relative",
-              }}
-            >
-              {index % (60 * displayTimeScaleUnit()) == 0 && (
-                <>
-                  <span style={{ borderRight: "solid" }}></span>
-                  <span
-                    style={{ position: "absolute", top: "-20px", left: "-4px" }}
-                  >
-                    {index / 60}
-                  </span>
-                </>
-              )}
-            </div>
-          </Tooltip>
-        );
-      })}
-    </div>
+    <>
+      <div
+        style={{
+          marginTop: "20px",
+          height: "50px",
+          width: width + "px",
+          border: "solid",
+          display: "grid",
+          gridTemplateColumns: `repeat(${dayMinutes}, 1fr)`,
+        }}
+      >
+        {[...Array(dayMinutes)].map((_, minutes) => {
+          return (
+            <Tooltip title={currentSpanParamsForMinutes(minutes)[0]}>
+              <div
+                key={minutes}
+                onClick={() => {
+                  currentSpanParamsForMinutes(minutes)[1] != "white"
+                    ? (window.location.href = currentSpanParamsForMinutes(minutes)[2])
+                    : "";
+                }}
+                style={{
+                  backgroundColor: currentSpanParamsForMinutes(minutes)[1],
+                  width: "auto",
+                  position: "relative",
+                }}
+              >
+                {minutes % (60 * displayTimeScaleUnit()) == 0 && (
+                  <>
+                    <span style={{ borderRight: "solid" }}></span>
+                    <span
+                      style={{ position: "absolute", top: "-20px", left: "-4px" }}
+                    >
+                      {minutes / 60}
+                    </span>
+                  </>
+                )}
+              </div>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </>
   );
 };
 
