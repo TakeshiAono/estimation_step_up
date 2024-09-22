@@ -134,7 +134,10 @@ const Task = ({
   const [progressRate, setProgressRate] = useState(task.progressRate)
 
   const doneTimeRate = () => {
-    return (operatingTime + surveyTime) / 3600 / predictionRequiredTimeOfFirst * 100
+    if (predictionRequiredTimeOfFirst == null || predictionRequiredTimeOfFirst == 0) {
+      return 0
+    }
+    return Math.round((operatingTime + surveyTime) / 3600 / predictionRequiredTimeOfFirst * 100)
   }
 
   useEffect(() => {
