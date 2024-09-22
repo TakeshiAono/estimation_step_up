@@ -11,12 +11,13 @@ export async function POST(
   let status = 200;
 
   try {
-    const { url, title, status } = await request.json();
+    const { url, title, status, deadline } = await request.json();
     result = await prisma.ticket.create({
       data: {
         url: url,
         title: title,
         status: status,
+        deadline: deadline,
       },
     });
     console.log("create complete");

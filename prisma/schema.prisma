@@ -19,6 +19,8 @@ model Ticket {
   url       String?
   status    Int
   totalTime Int      @default(0)
+  calculatedDoneDate               DateTime?     @map("calculated_done_date")
+  deadline                     DateTime?     @map("deadline")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   tasks     Task[]

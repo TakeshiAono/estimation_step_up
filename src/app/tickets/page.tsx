@@ -21,6 +21,10 @@ import Link from "next/link";
 import TicketModal from "../components/TicketModal";
 import axios from "axios";
 import { Statuses } from "../constants/TaskConstants";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from "dayjs";
 
 export default function TicketView() {
   const [page, setPage] = useState(0);
@@ -30,6 +34,7 @@ export default function TicketView() {
   const [status, setStatus] = useState("NotYet");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [deadline, setDeadline] = useState("");
   const [ticketItems, setTicketItems] = useState<any>([]);
   const [editTicketItem, setEditTicketItem] = useState<any>([]);
 
@@ -121,10 +126,11 @@ export default function TicketView() {
     status: string,
     title: string,
     url: number,
+    deadline: string,
     numberOfTask: number,
     totalTime: number,
   ) {
-    return { id, status, title, url, numberOfTask, totalTime };
+    return { id, status, title, url, deadline, numberOfTask, totalTime };
   }
 
   const createTicket = async () => {
@@ -144,6 +150,7 @@ export default function TicketView() {
           title: title,
           status: TicketStatuses[status],
           url: url,
+          deadline: deadline
         }),
       );
       const newItem = createData(
@@ -151,12 +158,13 @@ export default function TicketView() {
         TicketStatuses[status],
         title,
         url,
+        deadline,
         0,
         0,
       );
       setTicketItems([newItem, ...ticketItems]);
     } catch (e) {
-      console.log("リクエストエラー");
+      console.log("Error:", e);
     } finally {
       closeModal();
     }
@@ -195,6 +203,7 @@ export default function TicketView() {
                   {column.label}
                 </TableCell>
               ))}
+              <TableCell>デッドライン</TableCell>
               <TableCell></TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -221,6 +230,7 @@ export default function TicketView() {
                         </TableCell>
                       );
                     })}
+                    <TableCell>{row?.deadline && dayjs(row?.deadline).format("YYYY-MM-DD")}</TableCell>
                     <TableCell>
                       <Button
                         variant="contained"
@@ -318,6 +328,16 @@ export default function TicketView() {
                 });
               }}
             />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label="デッドライン"
+                value={dayjs(editTicketItem.deadline)}
+                onChange={(e) => {
+                  setEditTicketItem((ticketItem) => {
+                    return { ...ticketItem, deadline: e?.format() };
+                  });
+                }}
+              />
+            </LocalizationProvider>
           </FormControl>
         </TicketModal>
       ) : (
@@ -361,6 +381,9 @@ export default function TicketView() {
                 setUrl(e.target.value);
               }}
             />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label="デッドライン" onChange={(e) => {setDeadline(e.format())}}/>
+            </LocalizationProvider>
           </FormControl>
         </TicketModal>
       )}

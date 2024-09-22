@@ -8,7 +8,6 @@ export async function GET(): Promise<Promise<unknown>> {
   let status = 200;
 
   try {
-    // const {url, title, status} = await request.json()
     result = await prisma.ticket.findMany();
     console.log("index complete");
   } catch (e) {
