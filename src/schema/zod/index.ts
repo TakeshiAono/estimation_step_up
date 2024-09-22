@@ -58,7 +58,7 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const TicketScalarFieldEnumSchema = z.enum(['id','title','url','status','totalTime','createdAt','updatedAt']);
 
-export const TaskScalarFieldEnumSchema = z.enum(['id','isSurveyTask','operatedTermsJsonForTimeBarChart','ticketId','status','type','title','parentId','createdAt','updatedAt']);
+export const TaskScalarFieldEnumSchema = z.enum(['id','isSurveyTask','operatedTermsJsonForTimeBarChart','ticketId','progressRate','status','type','title','parentId','createdAt','updatedAt']);
 
 export const PlanScalarFieldEnumSchema = z.enum(['id','taskId','predictionRequiredTimeOfFirst','predictionRequiredTimeOfFinal','predictionSurveyTimeOfFirst','predictionSurveyTimeOfFinal','surveyDetail','createdAt','updatedAt']);
 
@@ -121,6 +121,7 @@ export const TaskSchema = z.object({
   isSurveyTask: z.boolean(),
   operatedTermsJsonForTimeBarChart: JsonValueSchema.nullable(),
   ticketId: z.number().int().nullable(),
+  progressRate: z.number().int().nullable(),
   status: z.number().int(),
   type: z.number().int(),
   title: z.string().nullable(),

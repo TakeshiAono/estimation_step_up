@@ -30,6 +30,7 @@ model Task {
   ticket                           Ticket?       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   operatedTermsJsonForTimeBarChart Json?         @map("operated_terms_json_for_time_bar_chart")
   ticketId                         Int?          @map("ticket_id")
+  progressRate                     Int?          @map("progress_rate")
   status                           Int
   type                             Int
   title                            String?

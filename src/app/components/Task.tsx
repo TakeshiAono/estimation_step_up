@@ -8,7 +8,9 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Stack,
   TextField,
+  Slider,
 } from "@mui/material";
 import Radio from "@mui/joy/Radio";
 import RadioGroup from "@mui/joy/RadioGroup";
@@ -25,6 +27,7 @@ import dayjs from "dayjs";
 import TaskOperationMessage from "./TaskOperationMessage";
 import { v4 as uuid } from "uuid";
 import seedrandom from "seedrandom";
+import { GaugeComponent } from "react-gauge-component";
 
 type Props = {
   seconds: number;
@@ -128,14 +131,24 @@ const Task = ({
     ).length > 0,
   );
   const taskTermId = useRef(uuid());
-  const isOperatingTask = operatingTaskId == task.id
-  const terms = useRef(task.operatedTermsJsonForTimeBarChart?.filter(term => dayjs(term.start).startOf("day").toString() === dayjs().startOf("day").toString() && dayjs(term.start).toString() !== dayjs(term.end).toString()))
+  const [progressRate, setProgressRate] = useState(task.progressRate)
+
+  const doneTimeRate = () => {
+    return (operatingTime + surveyTime) / 3600 / predictionRequiredTimeOfFirst * 100
+  }
 
   useEffect(() => {
     if (!isInitialRender.current) {
       mutationTask();
     }
   }, [status]);
+
+  // TODO: プログレスバーの値を変更するごとにリクエストが飛ぶのでどうにかしないと
+  useEffect(() => {
+    if (!isInitialRender.current) {
+      mutationTask();
+    }
+  }, [progressRate]);
 
   useEffect(() => {
     if (operatingTaskId == task.id) {
@@ -211,6 +224,7 @@ const Task = ({
       isSurveyTask: isSurveyTask,
       status: status,
       type: type,
+      progressRate: progressRate,
       title: title,
       parentId: parentId,
       ticketId: ticketId,
@@ -252,6 +266,56 @@ const Task = ({
         isPredictionRequiredTimeOfFirst={!!predictionRequiredTimeOfFirst}
         isSelectedTicket={!!ticketId}
       />
+      <Stack direction="row" justifyContent="start">
+        <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+          <span>進捗率</span>
+          <GaugeComponent
+            arc={{
+              subArcs: [
+                {
+                  limit: (doneTimeRate() < 1) && 0,
+                  color: "#EA4228",
+                  showTick: true,
+                },
+                {
+                  limit: 100,
+                  color: "#5BE12C",
+                  showTick: true,
+                },
+              ],
+            }}
+            value={progressRate}
+            style={{width: 200}}
+          />
+          <div style={{ width: "150px"}}>
+            <Slider step={10} value={progressRate} onChange={(e)=>{setProgressRate(e.target.value)}} />
+          </div>
+          {/* {progressRate} */}
+        </div>
+        { doneTimeRate() > 1 &&
+          <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <span>稼働時間/予想完了時間</span>
+            <GaugeComponent
+              arc={{
+                subArcs: [
+                  {
+                    limit: (progressRate > 99) ? 99 : progressRate,
+                    color: "#5BE12C",
+                    showTick: true,
+                  },
+                  {
+                    limit: 100,
+                    color: "#EA4228",
+                    showTick: true,
+                  },
+                ],
+              }}
+              value={doneTimeRate()}
+              style={{width: 200}}
+            />
+          </div>
+        }
+      </Stack>
       {!!task.parentId || (
         <div className={styles.inputBlock} style={{ marginBottom: "10px" }}>
           <span style={{ marginLeft: "10px" }}>チケット: </span>
