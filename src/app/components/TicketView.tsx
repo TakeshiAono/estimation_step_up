@@ -127,20 +127,6 @@ export default function TicketView({
     }
   };
 
-  const fetchSetting = async () => {
-    try {
-      const { data } = await axios.get<{
-        startBusinessTime: string;
-        endBusinessTime: string;
-      }>(`http://localhost:3001/api/settings/dummy`);
-      console.log(data);
-      setStartBusinessTime(dayjs(data.startBusinessTime));
-      setEndBusinessTime(dayjs(data.endBusinessTime));
-    } catch (error) {
-      console.log("Error", error);
-    }
-  };
-
   const storeSetting = async (
     startBusinessTime: Dayjs,
     endBusinessTime: Dayjs,
@@ -282,12 +268,12 @@ export default function TicketView({
         .add(addHour, "h");
     } else if (dayjs() > startBusinessTime && dayjs() < endBusinessTime) {
       // NOTE: 業務中
-      const endOverHour = dayjs()
+      const endOverHour = Math.abs(dayjs()
         .add(addHour, "h")
-        .diff(dayjs().set("h", endBusinessTime.get("h")));
+        .diff(dayjs().set("h", endBusinessTime.get("h")), "h"));
       if (endOverHour > 0) {
         doneDate = dayjs()
-          .add(addDay, "d")
+          .add(addDay + 1, "d")
           .set("h", startBusinessTime.get("h"))
           .add(endOverHour, "h");
       } else {
@@ -416,8 +402,9 @@ export default function TicketView({
                         case "完了予想日":
                           return (
                             <TableCell key={row.id + "column2"}>
+                              {/* TODO: チケットごとに休日を含むか含まないかを選択したい */}
                               {estimatedDoneDate(row.id, true)?.format(
-                                "YYYY/MM/DD(ddd) HH:mm",
+                                "YYYY/MM/DD(ddd)",
                               )}
                             </TableCell>
                           );
