@@ -380,7 +380,7 @@ export default function TicketView({
       <TableContainer sx={{ maxHeight: 800 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
-            <TableRow>
+            <TableRow key={"header"}>
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -390,9 +390,9 @@ export default function TicketView({
                   {column.label}
                 </TableCell>
               ))}
-              <TableCell>デッドライン</TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
+              <TableCell key={"deadline"}>デッドライン</TableCell>
+              <TableCell key={"button-area1"}></TableCell>
+              <TableCell key={"button-area2"}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -407,7 +407,7 @@ export default function TicketView({
                       switch (column.label) {
                         case "URL":
                           return (
-                            <TableCell>
+                            <TableCell key={row.id + "column1"}>
                               <Link href={value} target="_blank">
                                 {value}
                               </Link>
@@ -415,7 +415,7 @@ export default function TicketView({
                           );
                         case "完了予想日":
                           return (
-                            <TableCell>
+                            <TableCell key={row.id + "column2"}>
                               {estimatedDoneDate(row.id, true)?.format(
                                 "YYYY/MM/DD(ddd) HH:mm",
                               )}
@@ -423,7 +423,7 @@ export default function TicketView({
                           );
                         case "合計所要時間":
                           return (
-                            <TableCell>
+                            <TableCell key={row.id + "column3"}>
                               {tasksByTicket[row.id]
                                 ?.map((task) => {
                                   return (
@@ -447,7 +447,10 @@ export default function TicketView({
                           );
                         default:
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell
+                              key={row.id + "column4"}
+                              align={column.align}
+                            >
                               {column.format && typeof value === "number"
                                 ? column.format(value)
                                 : value}
@@ -455,11 +458,11 @@ export default function TicketView({
                           );
                       }
                     })}
-                    <TableCell>
+                    <TableCell key={row.id + "column5"}>
                       {row?.deadline &&
                         dayjs(row?.deadline).format("YYYY-MM-DD")}
                     </TableCell>
-                    <TableCell>
+                    <TableCell key={row.id + "column6"}>
                       <Button
                         variant="contained"
                         color="success"
@@ -472,7 +475,7 @@ export default function TicketView({
                         編集
                       </Button>
                     </TableCell>
-                    <TableCell>
+                    <TableCell key={row.id + "column7"}>
                       <Button
                         variant="contained"
                         color="error"
