@@ -21,9 +21,11 @@ const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
   const currentSpanParamsForMinutes = (minutes: number) => {
     const index = operatingTaskMinutesMaps?.findIndex(
       (operatingTaskMinutesMap) => {
-        console.log()
-        return operatingTaskMinutesMap.start <= minutes && minutes <= operatingTaskMinutesMap.end
-      }
+        return (
+          operatingTaskMinutesMap.start <= minutes &&
+          minutes <= operatingTaskMinutesMap.end
+        );
+      },
     );
     if (index != -1) {
       if (
@@ -70,7 +72,8 @@ const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
                 key={minutes}
                 onClick={() => {
                   currentSpanParamsForMinutes(minutes)[1] != "white"
-                    ? (window.location.href = currentSpanParamsForMinutes(minutes)[2])
+                    ? (window.location.href =
+                        currentSpanParamsForMinutes(minutes)[2])
                     : "";
                 }}
                 style={{
@@ -83,7 +86,11 @@ const TimeBarChart = ({ width, operatingTaskMinutesMaps }: Props) => {
                   <>
                     <span style={{ borderRight: "solid" }}></span>
                     <span
-                      style={{ position: "absolute", top: "-20px", left: "-4px" }}
+                      style={{
+                        position: "absolute",
+                        top: "-20px",
+                        left: "-4px",
+                      }}
                     >
                       {minutes / 60}
                     </span>

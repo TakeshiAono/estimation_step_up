@@ -82,7 +82,7 @@ const Task = ({
         return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
           ? prev + next.operatingTime
           : prev;
-      }, 0)
+      }, 0),
   );
   const [pastSurveyTime, setPastSurveyTime] = useState(
     achievements.histories &&
@@ -90,18 +90,18 @@ const Task = ({
         return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
           ? prev + next.surveyTime
           : prev;
-      }, 0)
+      }, 0),
   );
   const [operatingTime, setOperatingTime] = useState(
     achievements.histories &&
       achievements.histories.reduce(
         (prev, next) => prev + next.operatingTime,
-        0
-      )
+        0,
+      ),
   );
   const [surveyTime, setSurveyTime] = useState(
     achievements.histories &&
-      achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0)
+      achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0),
   );
   const [isEditing, setIsEditing] = useState(false);
   // const [ticketItems, setTicketItems] = useState<any>([]);
@@ -132,8 +132,8 @@ const Task = ({
     achievements.histories?.filter(
       (history) =>
         dayjs(history.createdAt).startOf("day").format().toString() ===
-        dayjs().startOf("day").format().toString()
-    ).length > 0
+        dayjs().startOf("day").format().toString(),
+    ).length > 0,
   );
   const taskTermId = useRef(uuid());
   const isOperatingTask = operatingTaskId == task.id;
@@ -142,18 +142,24 @@ const Task = ({
       (term) =>
         dayjs(term.start).startOf("day").toString() ===
           dayjs().startOf("day").toString() &&
-        dayjs(term.start).toString() !== dayjs(term.end).toString()
-    )
+        dayjs(term.start).toString() !== dayjs(term.end).toString(),
+    ),
   );
 
-  const [progressRate, setProgressRate] = useState(task.progressRate)
+  const [progressRate, setProgressRate] = useState(task.progressRate);
 
   const doneTimeRate = () => {
-    if (predictionRequiredTimeOfFirst == null || predictionRequiredTimeOfFirst == 0) {
-      return 0
+    if (
+      predictionRequiredTimeOfFirst == null ||
+      predictionRequiredTimeOfFirst == 0
+    ) {
+      return 0;
     }
-    return Math.round((operatingTime + surveyTime) / 3600 / predictionRequiredTimeOfFirst * 100)
-  }
+    return Math.round(
+      ((operatingTime + surveyTime) / 3600 / predictionRequiredTimeOfFirst) *
+        100,
+    );
+  };
 
   useEffect(() => {
     if (!isInitialRender.current) {
@@ -225,7 +231,7 @@ const Task = ({
           // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
           surveyTime: surveyTime - pastSurveyTime,
           operatingTime: operatingTime - pastOperatingTime,
-        }
+        },
       );
     } else {
       historyCreated.current = true;
@@ -235,7 +241,7 @@ const Task = ({
           // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
           surveyTime: surveyTime - pastSurveyTime,
           operatingTime: operatingTime - pastOperatingTime,
-        }
+        },
       );
     }
   };
@@ -289,13 +295,19 @@ const Task = ({
         isSelectedTicket={!!ticketId}
       />
       <Stack direction="row" justifyContent="start">
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           <span>進捗率</span>
           <GaugeComponent
             arc={{
               subArcs: [
                 {
-                  limit: (doneTimeRate() < 1) && 0,
+                  limit: doneTimeRate() < 1 && 0,
                   color: "#EA4228",
                   showTick: true,
                 },
@@ -307,21 +319,33 @@ const Task = ({
               ],
             }}
             value={progressRate}
-            style={{width: 200}}
+            style={{ width: 200 }}
           />
-          <div style={{ width: "150px"}}>
-            <Slider step={10} value={progressRate} onChange={(e)=>{setProgressRate(e.target.value)}} />
+          <div style={{ width: "150px" }}>
+            <Slider
+              step={10}
+              value={progressRate}
+              onChange={(e) => {
+                setProgressRate(e.target.value);
+              }}
+            />
           </div>
           {/* {progressRate} */}
         </div>
-        { doneTimeRate() > 1 &&
-          <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+        {doneTimeRate() > 1 && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <span>稼働時間/予想完了時間</span>
             <GaugeComponent
               arc={{
                 subArcs: [
                   {
-                    limit: (progressRate > 99) ? 99 : progressRate,
+                    limit: progressRate > 99 ? 99 : progressRate,
                     color: "#5BE12C",
                     showTick: true,
                   },
@@ -333,10 +357,10 @@ const Task = ({
                 ],
               }}
               value={doneTimeRate()}
-              style={{width: 200}}
+              style={{ width: 200 }}
             />
           </div>
-        }
+        )}
       </Stack>
       {
         <div className={styles.inputBlock} style={{ marginBottom: "10px" }}>
@@ -782,7 +806,7 @@ const Task = ({
                       } else {
                         return item;
                       }
-                    })
+                    }),
                   );
                 }}
               />
@@ -804,7 +828,7 @@ const Task = ({
                       } else {
                         return item;
                       }
-                    })
+                    }),
                   );
                 }}
               />
@@ -814,7 +838,7 @@ const Task = ({
                 color="error"
                 onClick={() => {
                   setTaskItems(
-                    taskItems.filter((item) => taskItem.id != item.id)
+                    taskItems.filter((item) => taskItem.id != item.id),
                   );
                 }}
               >

@@ -6,7 +6,6 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import StoreProvider from "./storeProvider";
 
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,9 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <StoreProvider>
-          <AppRouterCacheProvider>
-            {children}
-          </AppRouterCacheProvider>
+          <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
         </StoreProvider>
       </body>
     </html>

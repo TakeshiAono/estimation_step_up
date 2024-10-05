@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import iconv from 'iconv-lite'; // iconv-lite をインポート
+import fs from "fs";
+import path from "path";
+import iconv from "iconv-lite"; // iconv-lite をインポート
 
 export function ServerComponent() {
   const boxStyle = {
@@ -25,15 +25,16 @@ export function ServerComponent() {
 
 // サーバーサイドでファイルを読み込むコンポーネント
 export function getHoliday() {
-  const filePath = path.join(process.cwd(), 'src/libs', 'syukujitsu.csv');
+  const filePath = path.join(process.cwd(), "src/libs", "syukujitsu.csv");
   const fileBuffer = fs.readFileSync(filePath);
 
   // TODO: 配列の整形はクライアントサイドでやってもいいかも
-  const [_, ...holidayList] = iconv.decode(fileBuffer, 'Shift_JIS')
+  const [_, ...holidayList] = iconv
+    .decode(fileBuffer, "Shift_JIS")
     .trim()
-    .split('\n')
-    .map(line => line.split(',')[0])
-    .map(date => date.replace(/\//g, '-'));  // / を - に置き換える処理を追加
+    .split("\n")
+    .map((line) => line.split(",")[0])
+    .map((date) => date.replace(/\//g, "-")); // / を - に置き換える処理を追加
 
-  return holidayList
+  return holidayList;
 }
