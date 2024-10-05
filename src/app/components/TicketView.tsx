@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import _ from "lodash";
@@ -6,7 +6,7 @@ import Link from "next/link";
 import dayjs, { Dayjs } from "dayjs";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import dayjsBusinessTime from 'dayjs-business-time';
+import dayjsBusinessTime from "dayjs-business-time";
 import axios from "axios";
 
 import {
@@ -29,14 +29,32 @@ import { Statuses } from "../constants/TaskConstants";
 import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
-import { fetchAllTasks, getTasksByTicket } from "../features/taskSlice";
+import {
+  fetchAllTasks,
+  getTasksByTicket,
+  setTasks,
+} from "../features/taskSlice";
 
-export default function TicketView({holidayList}) {
-  dayjs.extend(dayjsBusinessTime)
+type Props = {
+  holidayList: string[];
+  startBusinessTimeProp: string;
+  endBusinessTimeProp: string;
+  convertTickets: any;
+  tasks: any;
+};
+
+export default function TicketView({
+  holidayList,
+  startBusinessTimeProp,
+  endBusinessTimeProp,
+  convertTickets,
+  tasks,
+}: Props) {
+  dayjs.extend(dayjsBusinessTime);
   // 祝日をセット
   dayjs.updateLocale("en", {
     holidays: holidayList,
-    holidayFormat: 'YYYY/MM/DD',
+    holidayFormat: "YYYY/MM/DD",
   });
 
   const [page, setPage] = useState(0);
@@ -47,14 +65,19 @@ export default function TicketView({holidayList}) {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [ticketItems, setTicketItems] = useState<any>([]);
+  const [ticketItems, setTicketItems] = useState<any>(convertTickets);
   const [editTicketItem, setEditTicketItem] = useState<any>([]);
-  const [isBusinessTimeModalOpen, setIsBusinessTimeModalOpen] = useState<boolean>(false);
-  const [startBusinessTime, setStartBusinessTime] = useState<Dayjs | null>(null);
-  const [endBusinessTime, setEndBusinessTime] = useState<Dayjs | null>(null);
+  const [isBusinessTimeModalOpen, setIsBusinessTimeModalOpen] =
+    useState<boolean>(false);
+  const [startBusinessTime, setStartBusinessTime] = useState<Dayjs>(
+    dayjs(startBusinessTimeProp),
+  );
+  const [endBusinessTime, setEndBusinessTime] = useState<Dayjs>(
+    dayjs(endBusinessTimeProp),
+  );
 
-  const inputStartBusinessTime = useRef<Dayjs | null>(null)
-  const inputEndBusinessTime = useRef<Dayjs | null>(null)
+  const inputStartBusinessTime = useRef<Dayjs | null>(null);
+  const inputEndBusinessTime = useRef<Dayjs | null>(null);
 
   const tasksByTicket = useSelector(getTasksByTicket);
   const dispatch = useDispatch();
@@ -64,30 +87,11 @@ export default function TicketView({holidayList}) {
   };
 
   useEffect(() => {
-    const fetchTickets = async () => {
-      const { data } = await axios.get("http://localhost:3001/api/tickets");
-      return data.sort((item) => item.id).reverse();
-    };
-
-    fetchSetting()
-
-    fetchTickets().then((tickets) => {
-      const changedStatusItems = tickets.map((ticket) => {
-        const { status, ...others } = ticket;
-        const stringStatusCode = _.findKey(
-          Statuses,
-          (value) => value === status
-        );
-        return { status: stringStatusCode, ...others };
-      });
-      setTicketItems(changedStatusItems);
-    });
-
-    dispatch(fetchAllTasks());
+    dispatch(setTasks(tasks));
   }, []);
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
@@ -107,7 +111,7 @@ export default function TicketView({holidayList}) {
     try {
       await axios.put(
         `http://localhost:3001/api/tickets/${editTicketItem.id}`,
-        { ...editTicketItem, status: Statuses[editTicketItem.status] }
+        { ...editTicketItem, status: Statuses[editTicketItem.status] },
       );
       setTicketItems((items) =>
         items.map((item) => {
@@ -116,7 +120,7 @@ export default function TicketView({holidayList}) {
           } else {
             return item;
           }
-        })
+        }),
       );
     } catch (error) {
       console.log("Error", error);
@@ -125,26 +129,36 @@ export default function TicketView({holidayList}) {
 
   const fetchSetting = async () => {
     try {
-      const {data} = await axios.get<{startBusinessTime: string, endBusinessTime: string}>(
-        `http://localhost:3001/api/settings/dummy`
-      );
-      console.log(data)
-      setStartBusinessTime(dayjs(data.startBusinessTime))
-      setEndBusinessTime(dayjs(data.endBusinessTime))
+      const { data } = await axios.get<{
+        startBusinessTime: string;
+        endBusinessTime: string;
+      }>(`http://localhost:3001/api/settings/dummy`);
+      console.log(data);
+      setStartBusinessTime(dayjs(data.startBusinessTime));
+      setEndBusinessTime(dayjs(data.endBusinessTime));
     } catch (error) {
       console.log("Error", error);
     }
   };
 
-  const storeSetting = async (startBusinessTime: Dayjs, endBusinessTime: Dayjs) => {
+  const storeSetting = async (
+    startBusinessTime: Dayjs,
+    endBusinessTime: Dayjs,
+  ) => {
     try {
-      console.log(startBusinessTime.toISOString(), endBusinessTime.toISOString())
-      const {data} = await axios.put<{startBusinessTime: string, endBusinessTime: string}>(
-        `http://localhost:3001/api/settings/dummy`,
-        { startBusinessTime: startBusinessTime.toISOString(), endBusinessTime: endBusinessTime.toISOString() }
+      console.log(
+        startBusinessTime.toISOString(),
+        endBusinessTime.toISOString(),
       );
-      setStartBusinessTime(dayjs(data.startBusinessTime))
-      setEndBusinessTime(dayjs(data.endBusinessTime))
+      const { data } = await axios.put<{
+        startBusinessTime: string;
+        endBusinessTime: string;
+      }>(`http://localhost:3001/api/settings/dummy`, {
+        startBusinessTime: startBusinessTime.toISOString(),
+        endBusinessTime: endBusinessTime.toISOString(),
+      });
+      setStartBusinessTime(dayjs(data.startBusinessTime));
+      setEndBusinessTime(dayjs(data.endBusinessTime));
     } catch (error) {
       console.log("Error", error);
     }
@@ -171,7 +185,7 @@ export default function TicketView({holidayList}) {
     { id: "url", label: "URL", minWidth: 100 },
     { id: "numberOfTask", label: "タスク数", minWidth: 20 },
     { id: "totalTime", label: "合計所要時間", minWidth: 20 },
-    { id: "estimatedDoneDate", label: "予想完了日", minWidth: 20 },
+    { id: "estimatedDoneDate", label: "完了予想日", minWidth: 20 },
   ];
 
   function createData(
@@ -181,7 +195,7 @@ export default function TicketView({holidayList}) {
     url: number,
     deadline: string,
     numberOfTask: number,
-    totalTime: number
+    totalTime: number,
   ) {
     return { id, status, title, url, deadline, numberOfTask, totalTime };
   }
@@ -204,7 +218,7 @@ export default function TicketView({holidayList}) {
           status: TicketStatuses[status],
           url: url,
           deadline: deadline,
-        })
+        }),
       );
       const newItem = createData(
         nextId.toString(),
@@ -213,7 +227,7 @@ export default function TicketView({holidayList}) {
         url,
         deadline,
         0,
-        0
+        0,
       );
       setTicketItems([newItem, ...ticketItems]);
     } catch (e) {
@@ -235,78 +249,97 @@ export default function TicketView({holidayList}) {
     setStatus(event.target.value);
   };
 
-  const estimatedDoneDate = (id: number, isExcludeHoliday = true): Dayjs | undefined => {
-    if(!(startBusinessTime && endBusinessTime)) return
+  const estimatedDoneDate = (
+    id: number,
+    isExcludeHoliday = true,
+  ): Dayjs | undefined => {
+    if (!(startBusinessTime && endBusinessTime)) return;
 
-    const sumHour = tasksByTicket[id]?.map((task) => {
-      if (task.status == Statuses.Done) {
-        return 0
-      } else {
-        return (
-          task.plans[0].predictionRequiredTimeOfFirst
-        )
-      }
-    }).reduce((prev, next) => prev + next)
+    const sumHour = tasksByTicket[id]
+      ?.map((task) => {
+        if (task.status == Statuses.Done) {
+          return 0;
+        } else {
+          return task.plans[0].predictionRequiredTimeOfFirst;
+        }
+      })
+      .reduce((prev, next) => prev + next);
 
     // NOTE: 1日8h作業を基準とする
-    const restTime = 1 // 1時間の休憩時間
-    const activeTime = endBusinessTime.diff(startBusinessTime, "h")
-    const addDay = Math.floor(sumHour / (activeTime - restTime))
-    const addHour = sumHour % (activeTime - restTime)
+    const restTime = 1; // 1時間の休憩時間
+    const activeTime = endBusinessTime.diff(startBusinessTime, "h");
+    const addDay = Math.floor(sumHour / (activeTime - restTime));
+    const addHour = sumHour % (activeTime - restTime);
 
-    let doneDate = null
+    let doneDate = null;
     // TODO:それぞれ休憩時間分1hずれてそうな感じがする
-    if(dayjs() < endBusinessTime && dayjs() < startBusinessTime) {
+    if (dayjs() < endBusinessTime && dayjs() < startBusinessTime) {
       // NOTE: 業務開始前
-      doneDate = dayjs().add(addDay, "d").set("h", startBusinessTime.get("h")).set("m", startBusinessTime.get("m")).add(addHour, "h")
-    } else if(dayjs() > startBusinessTime && dayjs() < endBusinessTime) {
+      doneDate = dayjs()
+        .add(addDay, "d")
+        .set("h", startBusinessTime.get("h"))
+        .set("m", startBusinessTime.get("m"))
+        .add(addHour, "h");
+    } else if (dayjs() > startBusinessTime && dayjs() < endBusinessTime) {
       // NOTE: 業務中
-      const endOverHour = dayjs().add(addHour, "h").diff(dayjs().set("h", endBusinessTime.get("h")))
-      if(endOverHour > 0) {
-        doneDate = dayjs().add(addDay, "d").set("h", startBusinessTime.get("h")).add(endOverHour, "h")
+      const endOverHour = dayjs()
+        .add(addHour, "h")
+        .diff(dayjs().set("h", endBusinessTime.get("h")));
+      if (endOverHour > 0) {
+        doneDate = dayjs()
+          .add(addDay, "d")
+          .set("h", startBusinessTime.get("h"))
+          .add(endOverHour, "h");
       } else {
-        doneDate = dayjs().add(addDay, "d").add(addHour, "h")
+        doneDate = dayjs().add(addDay, "d").add(addHour, "h");
       }
     } else {
       // NOTE: 業務終了後
-      doneDate = dayjs().add(addDay + 1, "d").set("h", startBusinessTime.get("h")).set("m", startBusinessTime.get("m")).add(addHour, "h")
+      doneDate = dayjs()
+        .add(addDay + 1, "d")
+        .set("h", startBusinessTime.get("h"))
+        .set("m", startBusinessTime.get("m"))
+        .add(addHour, "h");
     }
 
     if (isExcludeHoliday) {
-      return _.last(holidaySkipDateListAtTerm(doneDate))
+      return _.last(holidaySkipDateListAtTerm(doneDate));
     } else {
-      return doneDate
+      return doneDate;
     }
-  }
+  };
 
   const isHoliday = (date: Dayjs) => {
-    const targetDate = dayjs(date)
-    if(targetDate.day() == 0 || targetDate.day() == 6) {
-      return true
+    const targetDate = dayjs(date);
+    if (targetDate.day() == 0 || targetDate.day() == 6) {
+      return true;
     }
 
     // NOTE: 祝日の判定
-    return targetDate.isHoliday();  // trueになります
-  }
+    return targetDate.isHoliday(); // trueになります
+  };
 
   const holidaySkipDateListAtTerm = (endDate: Dayjs, startDate = dayjs()) => {
-    let tempList: Dayjs[] = []
-    const throwDayList: Dayjs[] = _.range(endDate.diff(startDate,"d") + 1).map((__, index) => {
-      let candidateDay
-      if(index === 0) {
-        candidateDay = startDate
-      } else {
-        const lastDay = _.last(tempList) as Dayjs
-        candidateDay = lastDay.add(1, "d")
-      }
-      while(isHoliday(candidateDay)) {
-        candidateDay = candidateDay.add(1, "d")
-      }
-      tempList.push(candidateDay)
-      return candidateDay
-    })
-    return throwDayList
-  }
+    let tempList: Dayjs[] = [];
+    const throwDayList: Dayjs[] = _.range(endDate.diff(startDate, "d") + 1).map(
+      (__, index) => {
+        let candidateDay;
+        if (index === 0) {
+          candidateDay = startDate;
+        } else {
+          const lastDay = _.last(tempList) as Dayjs;
+          candidateDay = lastDay.add(1, "d");
+        }
+
+        while (isHoliday(candidateDay)) {
+          candidateDay = candidateDay.add(1, "d");
+        }
+        tempList.push(candidateDay);
+        return candidateDay;
+      },
+    );
+    return throwDayList;
+  };
 
   return (
     <>
@@ -316,13 +349,30 @@ export default function TicketView({holidayList}) {
       <Link href="/tasks">
         <p>タスク一覧へ</p>
       </Link>
-      <div style={{display: "flex", alignItems: "center"}}>
+      <div style={{ display: "flex", alignItems: "center" }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <TimePicker disabled={true} label="業務開始時間" format="HH:mm" ampm={false} value={startBusinessTime}/>
-          <TimePicker disabled={true} label="業務終了時間" format="HH:mm" ampm={false} value={endBusinessTime}/>
+          <TimePicker
+            disabled={true}
+            label="業務開始時間"
+            format="HH:mm"
+            ampm={false}
+            value={startBusinessTime}
+          />
+          <TimePicker
+            disabled={true}
+            label="業務終了時間"
+            format="HH:mm"
+            ampm={false}
+            value={endBusinessTime}
+          />
         </LocalizationProvider>
-        <div style={{marginLeft: 20}}>
-          <Button variant="contained" onClick={() => {setIsBusinessTimeModalOpen(true)}}>
+        <div style={{ marginLeft: 20 }}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setIsBusinessTimeModalOpen(true);
+            }}
+          >
             業務時間を設定する
           </Button>
         </div>
@@ -363,12 +413,12 @@ export default function TicketView({holidayList}) {
                               </Link>
                             </TableCell>
                           );
-                        case "予想完了日":
+                        case "完了予想日":
                           return (
                             <TableCell>
-                              {
-                                estimatedDoneDate(row.id, true)?.format("YYYY/MM/DD(ddd) HH:mm")
-                              }
+                              {estimatedDoneDate(row.id, true)?.format(
+                                "YYYY/MM/DD(ddd) HH:mm",
+                              )}
                             </TableCell>
                           );
                         case "合計所要時間":
@@ -376,7 +426,6 @@ export default function TicketView({holidayList}) {
                             <TableCell>
                               {tasksByTicket[row.id]
                                 ?.map((task) => {
-                                  console.log("たすく", task.id == 171 && task);
                                   return (
                                     task.achievements[0].histories?.reduce(
                                       (prev, next) => {
@@ -386,7 +435,7 @@ export default function TicketView({holidayList}) {
                                           next.surveyTime
                                         );
                                       },
-                                      0
+                                      0,
                                     ) / 3600
                                   );
                                 })
@@ -450,9 +499,18 @@ export default function TicketView({holidayList}) {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
       <TicketModal
-        onSuccess={() => {inputStartBusinessTime.current && inputEndBusinessTime.current && storeSetting(inputStartBusinessTime.current, inputEndBusinessTime.current)}}
+        onSuccess={() => {
+          inputStartBusinessTime.current &&
+            inputEndBusinessTime.current &&
+            storeSetting(
+              inputStartBusinessTime.current,
+              inputEndBusinessTime.current,
+            );
+        }}
         isOpen={isBusinessTimeModalOpen}
-        onCloseModal={() =>{setIsBusinessTimeModalOpen(false)}}
+        onCloseModal={() => {
+          setIsBusinessTimeModalOpen(false);
+        }}
         title={"業務時間設定"}
         description={"完了予想日の計算に関連する業務時間を設定してください。"}
       >
@@ -468,8 +526,22 @@ export default function TicketView({holidayList}) {
           }}
         >
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <TimePicker label="業務開始時間" format="HH:mm" ampm={false} onChange={(value) => {inputStartBusinessTime.current = value}}/>
-            <TimePicker label="業務終了時間" format="HH:mm" ampm={false} onChange={(value) => {inputEndBusinessTime.current = value}}/>
+            <TimePicker
+              label="業務開始時間"
+              format="HH:mm"
+              ampm={false}
+              onChange={(value) => {
+                inputStartBusinessTime.current = value;
+              }}
+            />
+            <TimePicker
+              label="業務終了時間"
+              format="HH:mm"
+              ampm={false}
+              onChange={(value) => {
+                inputEndBusinessTime.current = value;
+              }}
+            />
           </LocalizationProvider>
         </FormControl>
       </TicketModal>
