@@ -18,7 +18,13 @@ import styles from "../css/Task.module.css";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import _ from "lodash";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  DateCalendar,
+  DateTimePicker,
+  LocalizationProvider,
+  TimeClock,
+  TimePicker,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Statuses, TaskTypes } from "@/app/constants/TaskConstants";
 import type { Task } from "@/schema/zod";
@@ -71,32 +77,31 @@ const Task = ({
   const [title, setTitle] = useState(task.title);
   const [isParentTask, setIsParentTask] = useState(false);
   const [pastOperatingTime, setPastOperatingTime] = useState(
-    (achievements.histories &&
+    achievements.histories &&
       achievements.histories.reduce((prev, next) => {
         return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
           ? prev + next.operatingTime
           : prev;
       }, 0)
-    )
   );
   const [pastSurveyTime, setPastSurveyTime] = useState(
-    (achievements.histories &&
+    achievements.histories &&
       achievements.histories.reduce((prev, next) => {
         return dayjs(next.createdAt).startOf("day") < dayjs().startOf("day")
           ? prev + next.surveyTime
           : prev;
       }, 0)
-    )
   );
   const [operatingTime, setOperatingTime] = useState(
-    (achievements.histories &&
-      achievements.histories.reduce((prev, next) => prev + next.operatingTime, 0)
-    )
+    achievements.histories &&
+      achievements.histories.reduce(
+        (prev, next) => prev + next.operatingTime,
+        0
+      )
   );
   const [surveyTime, setSurveyTime] = useState(
-    (achievements.histories &&
+    achievements.histories &&
       achievements.histories.reduce((prev, next) => prev + next.surveyTime, 0)
-    )
   );
   const [isEditing, setIsEditing] = useState(false);
   // const [ticketItems, setTicketItems] = useState<any>([]);
@@ -127,10 +132,20 @@ const Task = ({
     achievements.histories?.filter(
       (history) =>
         dayjs(history.createdAt).startOf("day").format().toString() ===
-        dayjs().startOf("day").format().toString(),
-    ).length > 0,
+        dayjs().startOf("day").format().toString()
+    ).length > 0
   );
   const taskTermId = useRef(uuid());
+  const isOperatingTask = operatingTaskId == task.id;
+  const terms = useRef(
+    task.operatedTermsJsonForTimeBarChart?.filter(
+      (term) =>
+        dayjs(term.start).startOf("day").toString() ===
+          dayjs().startOf("day").toString() &&
+        dayjs(term.start).toString() !== dayjs(term.end).toString()
+    )
+  );
+
   const [progressRate, setProgressRate] = useState(task.progressRate)
 
   const doneTimeRate = () => {
@@ -164,7 +179,11 @@ const Task = ({
   }, [seconds]);
 
   useEffect(() => {
-    if (operatingTime % 60 === 1 && !isInitialRender.current && isOperatingTask) {
+    if (
+      operatingTime % 60 === 1 &&
+      !isInitialRender.current &&
+      isOperatingTask
+    ) {
       //NOTE:1分ごとに自動保存されるようにする。
       updateTime();
       saveTermForBarChart();
@@ -206,7 +225,7 @@ const Task = ({
           // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
           surveyTime: surveyTime - pastSurveyTime,
           operatingTime: operatingTime - pastOperatingTime,
-        },
+        }
       );
     } else {
       historyCreated.current = true;
@@ -216,7 +235,7 @@ const Task = ({
           // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
           surveyTime: surveyTime - pastSurveyTime,
           operatingTime: operatingTime - pastOperatingTime,
-        },
+        }
       );
     }
   };
@@ -319,7 +338,7 @@ const Task = ({
           </div>
         }
       </Stack>
-      {!!task.parentId || (
+      {
         <div className={styles.inputBlock} style={{ marginBottom: "10px" }}>
           <span style={{ marginLeft: "10px" }}>チケット: </span>
           <Select
@@ -347,7 +366,7 @@ const Task = ({
             })}
           </Select>
         </div>
-      )}
+      }
       <div
         style={{
           display: "flex",
@@ -460,6 +479,34 @@ const Task = ({
           }
         </div>
       </div>
+      {/* {JSON.stringify(terms.current)} */}
+      {/* aa{JSON.stringify(task.operatedTermsJsonForTimeBarChart.filter(term => dayjs(term.start).startOf("day").toString() === dayjs().startOf("day").toString()))} */}
+      {isEditing && (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          {terms.current?.map((term) => {
+            return (
+              <>
+                {/* <DateCalendar defaultValue={dayjs()} disableFuture /> */}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <div>
+                    <TimePicker
+                      defaultValue={dayjs(term.start)}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div style={{ display: "inline-block" }}>〜</div>
+                  <div>
+                    <TimePicker
+                      defaultValue={dayjs(term.end)}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </div>
+              </>
+            );
+          })}
+        </LocalizationProvider>
+      )}
       <div className={styles.task}>
         <FormControl>
           <RadioGroup
@@ -735,7 +782,7 @@ const Task = ({
                       } else {
                         return item;
                       }
-                    }),
+                    })
                   );
                 }}
               />
@@ -757,7 +804,7 @@ const Task = ({
                       } else {
                         return item;
                       }
-                    }),
+                    })
                   );
                 }}
               />
@@ -767,7 +814,7 @@ const Task = ({
                 color="error"
                 onClick={() => {
                   setTaskItems(
-                    taskItems.filter((item) => taskItem.id != item.id),
+                    taskItems.filter((item) => taskItem.id != item.id)
                   );
                 }}
               >

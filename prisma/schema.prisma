@@ -13,17 +13,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// TODO: 最終的にはuserにsettingを紐づける
+model Setting {
+  id                Int      @id @default(autoincrement())
+  startBusinessTime DateTime @default("2024-01-01T10:00:00+09:00") @map("start_business_time")
+  endBusinessTime   DateTime @default("2024-01-01T10:00:00+09:00") @map("end_business_time")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+}
+
 model Ticket {
-  id        Int      @id @default(autoincrement())
-  title     String
-  url       String?
-  status    Int
-  totalTime Int      @default(0)
-  calculatedDoneDate               DateTime?     @map("calculated_done_date")
-  deadline                     DateTime?     @map("deadline")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  tasks     Task[]
+  id                 Int       @id @default(autoincrement())
+  title              String
+  url                String?
+  status             Int
+  totalTime          Int       @default(0)
+  calculatedDoneDate DateTime? @map("calculated_done_date")
+  deadline           DateTime? @map("deadline")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  tasks              Task[]
 }
 
 model Task {

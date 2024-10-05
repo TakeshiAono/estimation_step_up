@@ -56,7 +56,9 @@ export type InputJsonValueType = z.infer<typeof InputJsonValueSchema>;
 
 export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
-export const TicketScalarFieldEnumSchema = z.enum(['id','title','url','status','totalTime','createdAt','updatedAt']);
+export const SettingScalarFieldEnumSchema = z.enum(['id','startBusinessTime','endBusinessTime','createdAt','updatedAt']);
+
+export const TicketScalarFieldEnumSchema = z.enum(['id','title','url','status','totalTime','calculatedDoneDate','deadline','createdAt','updatedAt']);
 
 export const TaskScalarFieldEnumSchema = z.enum(['id','isSurveyTask','operatedTermsJsonForTimeBarChart','ticketId','progressRate','status','type','title','parentId','createdAt','updatedAt']);
 
@@ -84,6 +86,20 @@ export const JsonNullValueFilterSchema = z.enum(['DbNull','JsonNull','AnyNull',]
 /////////////////////////////////////////
 
 /////////////////////////////////////////
+// SETTING SCHEMA
+/////////////////////////////////////////
+
+export const SettingSchema = z.object({
+  id: z.number().int(),
+  startBusinessTime: z.coerce.date(),
+  endBusinessTime: z.coerce.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type Setting = z.infer<typeof SettingSchema>
+
+/////////////////////////////////////////
 // TICKET SCHEMA
 /////////////////////////////////////////
 
@@ -93,6 +109,8 @@ export const TicketSchema = z.object({
   url: z.string().nullable(),
   status: z.number().int(),
   totalTime: z.number().int(),
+  calculatedDoneDate: z.coerce.date().nullable(),
+  deadline: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

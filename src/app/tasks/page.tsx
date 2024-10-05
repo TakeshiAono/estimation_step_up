@@ -1,4 +1,5 @@
 "use client";
+// FIXME: use clientを外してcomponentにTaskViewを映すべし
 
 import { useState } from "react";
 import _ from "lodash";

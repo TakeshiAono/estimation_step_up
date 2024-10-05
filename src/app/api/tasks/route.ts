@@ -26,7 +26,7 @@ export async function GET(
     tasks = await prisma.task.findMany({
       where: {
         ...ticketIdObject,
-        parentId: null,
+        // parentId: null,
         status: {
           not: Statuses.Done,
         },
