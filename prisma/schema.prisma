@@ -25,6 +25,7 @@ model Setting {
 model Ticket {
   id                 Int       @id @default(autoincrement())
   title              String
+  isNotified         Boolean   @default(false)
   url                String?
   status             Int
   totalTime          Int       @default(0)
@@ -43,6 +44,7 @@ model Task {
   ticketId                         Int?          @map("ticket_id")
   progressRate                     Int?          @map("progress_rate")
   status                           Int
+  isNotified                       Boolean       @default(false)
   type                             Int
   title                            String?
   plans                            Plan[]

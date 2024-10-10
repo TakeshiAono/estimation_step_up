@@ -1,4 +1,5 @@
 import { PrismaClient, Ticket } from "@prisma/client";
+import dayjs from "dayjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -28,12 +29,27 @@ export async function PUT(
 
   try {
     const { id } = params;
-    const data = { updatedAt: new Date(), ...(await request.json()) };
+    const newTicket: Ticket = { updatedAt: new Date(), ...(await request.json()) };
+
+    const ticketResult = await prisma.ticket.findFirst({
+      where: {
+        id: Number(params.id),
+      },
+    });
+    if(!ticketResult) throw new Error("ticket not found")
+    const prevTicket = ticketResult
+
+    if(prevTicket.deadline && newTicket.deadline) {
+      if(dayjs(prevTicket.deadline) < dayjs(newTicket.deadline)) {
+        newTicket.isNotified = false
+      }
+    }
+
     result = await prisma.ticket.update({
       where: {
         id: Number(id),
       },
-      data: data,
+      data: newTicket,
     });
     console.log("update complete");
   } catch (e) {

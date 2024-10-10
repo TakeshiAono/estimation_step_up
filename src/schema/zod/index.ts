@@ -58,9 +58,9 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const SettingScalarFieldEnumSchema = z.enum(['id','startBusinessTime','endBusinessTime','createdAt','updatedAt']);
 
-export const TicketScalarFieldEnumSchema = z.enum(['id','title','url','status','totalTime','calculatedDoneDate','deadline','createdAt','updatedAt']);
+export const TicketScalarFieldEnumSchema = z.enum(['id','title','isNotified','url','status','totalTime','calculatedDoneDate','deadline','createdAt','updatedAt']);
 
-export const TaskScalarFieldEnumSchema = z.enum(['id','isSurveyTask','operatedTermsJsonForTimeBarChart','ticketId','progressRate','status','type','title','parentId','createdAt','updatedAt']);
+export const TaskScalarFieldEnumSchema = z.enum(['id','isSurveyTask','operatedTermsJsonForTimeBarChart','ticketId','progressRate','status','isNotified','type','title','parentId','createdAt','updatedAt']);
 
 export const PlanScalarFieldEnumSchema = z.enum(['id','taskId','predictionRequiredTimeOfFirst','predictionRequiredTimeOfFinal','predictionSurveyTimeOfFirst','predictionSurveyTimeOfFinal','surveyDetail','createdAt','updatedAt']);
 
@@ -106,6 +106,7 @@ export type Setting = z.infer<typeof SettingSchema>
 export const TicketSchema = z.object({
   id: z.number().int(),
   title: z.string(),
+  isNotified: z.boolean(),
   url: z.string().nullable(),
   status: z.number().int(),
   totalTime: z.number().int(),
@@ -141,6 +142,7 @@ export const TaskSchema = z.object({
   ticketId: z.number().int().nullable(),
   progressRate: z.number().int().nullable(),
   status: z.number().int(),
+  isNotified: z.boolean(),
   type: z.number().int(),
   title: z.string().nullable(),
   parentId: z.number().int().nullable(),
