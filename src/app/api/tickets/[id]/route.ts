@@ -29,19 +29,22 @@ export async function PUT(
 
   try {
     const { id } = params;
-    const newTicket: Ticket = { updatedAt: new Date(), ...(await request.json()) };
+    const newTicket: Ticket = {
+      updatedAt: new Date(),
+      ...(await request.json()),
+    };
 
     const ticketResult = await prisma.ticket.findFirst({
       where: {
         id: Number(params.id),
       },
     });
-    if(!ticketResult) throw new Error("ticket not found")
-    const prevTicket = ticketResult
+    if (!ticketResult) throw new Error("ticket not found");
+    const prevTicket = ticketResult;
 
-    if(prevTicket.deadline && newTicket.deadline) {
-      if(dayjs(prevTicket.deadline) < dayjs(newTicket.deadline)) {
-        newTicket.isNotified = false
+    if (prevTicket.deadline && newTicket.deadline) {
+      if (dayjs(prevTicket.deadline) < dayjs(newTicket.deadline)) {
+        newTicket.isNotified = false;
       }
     }
 

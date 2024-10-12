@@ -268,9 +268,11 @@ export default function TicketView({
         .add(addHour, "h");
     } else if (dayjs() > startBusinessTime && dayjs() < endBusinessTime) {
       // NOTE: 業務中
-      const endOverHour = Math.abs(dayjs()
-        .add(addHour, "h")
-        .diff(dayjs().set("h", endBusinessTime.get("h")), "h"));
+      const endOverHour = Math.abs(
+        dayjs()
+          .add(addHour, "h")
+          .diff(dayjs().set("h", endBusinessTime.get("h")), "h"),
+      );
       if (endOverHour > 0) {
         doneDate = dayjs()
           .add(addDay + 1, "d")
