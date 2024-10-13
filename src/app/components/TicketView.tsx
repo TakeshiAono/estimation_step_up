@@ -31,9 +31,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
   fetchAllTasks,
-  getTasksByTicket,
+  getTasksGroupedByTicket,
   setTasks,
-} from "../features/taskSlice";
+} from "../stores/taskSlice";
 
 type Props = {
   holidayList: string[];
@@ -79,7 +79,7 @@ export default function TicketView({
   const inputStartBusinessTime = useRef<Dayjs | null>(null);
   const inputEndBusinessTime = useRef<Dayjs | null>(null);
 
-  const tasksByTicket = useSelector(getTasksByTicket);
+  const tasksByTicket = useSelector(getTasksGroupedByTicket);
   const dispatch = useDispatch();
 
   const handleChangePage = (event: unknown, newPage: number) => {

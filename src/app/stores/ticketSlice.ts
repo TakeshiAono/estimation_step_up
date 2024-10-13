@@ -1,21 +1,41 @@
 import axios from "axios";
+import dayjs, { Dayjs } from "dayjs";
 
-import { Ticket } from "@prisma/client";
 import {
   createAsyncThunk,
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
+import { Ticket } from "@prisma/client";
+import { Statuses } from "../constants/TaskConstants";
+import { RootState } from "../store";
+
+const selectTickets = (state: RootState) => state.ticket.tickets;
 
 export const getTickets = createSelector<
-  [(state: { ticket: { tickets: Ticket[] } }) => Ticket[]],
+  [(state: RootState) => Ticket[]],
   Ticket[]
->(
-  (state) => state.ticket.tickets,
-  (tickets) => {
-    return tickets;
-  },
-);
+>([selectTickets], (tickets) => {
+  return tickets;
+});
+
+export const getNotifyAbleTickets = createSelector<
+  [(state: RootState) => Ticket[]],
+  { title: string; isNotified: boolean; deadline: Dayjs }[]
+>([selectTickets], (tickets) => {
+  return tickets
+    .filter(
+      (ticket) =>
+        ticket.deadline &&
+        !ticket.isNotified &&
+        ticket.status !== Statuses.Done,
+    )
+    .map((ticket) => ({
+      title: ticket.title,
+      isNotified: ticket.isNotified,
+      deadline: dayjs(ticket.deadline as Date),
+    }));
+});
 
 export const fetchAllTickets = createAsyncThunk(
   "ticket/fetchAllTickets",

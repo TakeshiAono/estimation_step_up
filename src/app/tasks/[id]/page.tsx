@@ -3,21 +3,21 @@
 
 import { useState } from "react";
 import _ from "lodash";
-import type { Task as TaskType } from "@/schema/zod";
-
 import { useParams } from "next/navigation";
+
+import type { Task } from "@/schema/zod";
 import TaskMenu from "@/app/components/TaskMenu";
 import TaskArea from "@/app/components/TaskArea";
 
 export default function TaskView() {
-  const [newTaskItem, setNewTaskItem] = useState<TaskType>(null);
+  const [addTaskItem, setAddTaskItem] = useState<Task | null>(null);
   const params = useParams();
 
   return (
     <>
-      <TaskMenu onCreateTopTask={setNewTaskItem} isChildTask={true} />
+      <TaskMenu onCreateTopTask={setAddTaskItem} isChildTask={true} />
       <TaskArea
-        createdTopTask={newTaskItem}
+        addTopTask={addTaskItem}
         pathParameterTaskId={params.id as string}
       />
     </>

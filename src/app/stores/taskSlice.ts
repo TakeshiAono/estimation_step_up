@@ -1,15 +1,30 @@
+import { Task } from "@prisma/client";
 import {
   createAsyncThunk,
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
 import axios from "axios";
-import { groupBy, keys, map } from "lodash";
+import { groupBy } from "lodash";
+import { RootState } from "../store";
 
 // NOTE: 状態は変えず参照するだけの場合はselectorを使う
-export const getTasksByTicket = createSelector(
+export const getTasksGroupedByTicket = createSelector(
   (state) => state.task.tasks, // tasks 状態を取得
   (tasks) => groupBy(tasks, (task) => task.ticketId), // ticketId でグループ化
+);
+
+export const getTasksByTicketId = createSelector(
+  [
+    (state: RootState) => state.task.tasks, // tasks 状態を取得
+    (_: RootState, ticketId: number) => ticketId, // ticketIdを引数として受け取る
+  ],
+  (tasks, ticketId) => tasks.filter((task) => task.ticketId == ticketId), // ticketIdでフィルタリング
+);
+
+export const getAllTasks = createSelector(
+  (state) => state.task.tasks,
+  (tasks) => tasks,
 );
 
 export const fetchAllTasks = createAsyncThunk(
@@ -24,27 +39,10 @@ export const fetchAllTasks = createAsyncThunk(
 export const taskSlice = createSlice({
   name: "task",
   initialState: {
-    value: 100,
     tasks: [],
   },
 
   reducers: {
-    taskIncrement: (state) => {
-      state.value += 1;
-    },
-    taskDecrement: (state) => {
-      state.value -= 1;
-    },
-    taskIncrementByAmount: (state, action) => {
-      state.value += action.payload;
-    },
-    // fetchAllTasks: async () => {
-    //   return await axios.get(`http://localhost:3001/api/tasks`);
-    // },
-    getTasksByTicket: (state) => {
-      // state.tasks
-      return groupBy(state.tasks, (task) => task.ticketId);
-    },
     setTasks: (state, action) => {
       state.tasks = action.payload; // 新しいタスクをtasks配列に追加
     },
@@ -59,7 +57,6 @@ export const taskSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { taskIncrement, taskDecrement, taskIncrementByAmount, setTasks } =
-  taskSlice.actions;
+export const { setTasks } = taskSlice.actions;
 
 export default taskSlice.reducer;

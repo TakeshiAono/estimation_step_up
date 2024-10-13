@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import Radio from "@mui/joy/Radio";
 import RadioGroup from "@mui/joy/RadioGroup";
-import styles from "../css/Task.module.css";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import _ from "lodash";
@@ -28,12 +27,19 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Statuses, TaskTypes } from "@/app/constants/TaskConstants";
 import type { Task } from "@/schema/zod";
-import TaskModal from "./TaskModal";
 import dayjs from "dayjs";
-import TaskOperationMessage from "./TaskOperationMessage";
 import { v4 as uuid } from "uuid";
 import seedrandom from "seedrandom";
 import { GaugeComponent } from "react-gauge-component";
+
+import TaskModal from "./TaskModal";
+import TaskOperationMessage from "./TaskOperationMessage";
+import styles from "../css/Task.module.css";
+import {
+  createTimeAndOperatingTime,
+  mutateTimeAndOperatingTime,
+  saveTaskTerm,
+} from "../utils/apiUtil";
 
 type Props = {
   seconds: number;
@@ -209,12 +215,7 @@ const Task = ({
   }, []);
 
   const saveTermForBarChart = async () => {
-    // FIXME: TaskテーブルにoperatingTermJsonみたいな[{operatingDate: 日付, start: 100, end: 200},{operatingDate: 日付, start: 300, end: 400}]カラムを作り配列形式で保存する。そのデータをchartの中のデータを作成する
-    await axios.post(`http://localhost:3001/api/tasks/${task.id}/term`, {
-      taskTermId: taskTermId.current,
-    });
-    console.log("Save Start Time Complete");
-    // }
+    saveTaskTerm(task, taskTermId.current);
   };
 
   const switchOperatingTask = () => {
@@ -225,23 +226,21 @@ const Task = ({
 
   const updateTime = async () => {
     if (historyCreated.current) {
-      return await axios.patch(
-        `http://localhost:3001/api/tasks/${task.id}/time`,
-        {
-          // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
-          surveyTime: surveyTime - pastSurveyTime,
-          operatingTime: operatingTime - pastOperatingTime,
-        },
+      return await mutateTimeAndOperatingTime(
+        task,
+        surveyTime,
+        operatingTime,
+        pastSurveyTime,
+        pastOperatingTime,
       );
     } else {
       historyCreated.current = true;
-      return await axios.post(
-        `http://localhost:3001/api/tasks/${task.id}/time`,
-        {
-          // NOTE: operatingTime % 60 === 1 || surveyTime % 60 === 1の条件で保存されると毎回表示されるたびにtask一覧が表示されるたびにpatchリクエストが飛んでしまうので+1でずらす
-          surveyTime: surveyTime - pastSurveyTime,
-          operatingTime: operatingTime - pastOperatingTime,
-        },
+      return await createTimeAndOperatingTime(
+        task,
+        surveyTime,
+        operatingTime,
+        pastSurveyTime,
+        pastOperatingTime,
       );
     }
   };
@@ -277,8 +276,6 @@ const Task = ({
       },
     });
   };
-
-  const originRandomConst = seedrandom(task.id)();
 
   return (
     <div

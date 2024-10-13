@@ -14,8 +14,6 @@ export function ServerComponent() {
 
   const textStyle = { color: "white", footSize: "larger", fontWeight: "bold" };
 
-  console.log("Server Componentを実行しています");
-
   return (
     <div style={boxStyle}>
       <p style={textStyle}>Server Component</p>

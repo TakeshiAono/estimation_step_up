@@ -11,30 +11,37 @@ import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { Statuses } from "../constants/TaskConstants";
 import TimeBarChart, { OperatingTaskMinutesMaps } from "./TimeBarChart";
 import dayjs from "dayjs";
+import { AppDispatch } from "../store";
+import { useDispatch } from "react-redux";
+import { fetchAllTickets, getTickets } from "../stores/ticketSlice";
+import { useSelector } from "react-redux";
+import { getAllTasks } from "../stores/taskSlice";
 
 type Props = {
-  createdTopTask: Task;
+  addTopTask: TaskType | null;
   pathParameterTaskId?: string;
-  isMinimum?: boolean;
+  isMinimumDisplay?: boolean;
 };
 
 export default function TaskArea({
-  createdTopTask,
+  addTopTask,
   pathParameterTaskId,
-  isMinimum,
+  isMinimumDisplay,
 }: Props) {
   const [seconds, setSeconds] = useState(0);
   const [taskItems, setTaskItems] = useState<TaskType[]>([]);
-  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const tasks = useSelector(getAllTasks);
   const [isHidden, setIsHidden] = useState(false);
   const [operatingTaskId, setOperatingTaskId] = useState(null);
-  const [ticketItems, setTicketItems] = useState<any>([]);
+  const ticketItems = useSelector(getTickets);
   const [selectSearchTicketId, setSelectSearchTicketId] = useState<
     number | null
   >(localStorage.getItem("selectSearchTicketId"));
 
   const [operatingTaskMinutesMaps, setOperatingTaskMinutesMaps] =
     useState<OperatingTaskMinutesMaps>([]);
+
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     if (tasks) {
@@ -43,25 +50,7 @@ export default function TaskArea({
   }, [tasks]);
 
   useEffect(() => {
-    const fetchTickets = async () => {
-      const { data } = await axios.get("http://localhost:3001/api/tickets");
-      console.log(data);
-      return data.sort((item) => item.id).reverse();
-    };
-
-    const fetchAllTasks = async () => {
-      return await axios.get(`http://localhost:3001/api/tasks`);
-    };
-
-    fetchTickets().then((reuslt) => {
-      setTicketItems(() => {
-        return reuslt;
-      });
-    });
-
-    fetchAllTasks().then(({ data }) => {
-      setTasks(data);
-    });
+    dispatch(fetchAllTickets());
 
     // TODO: パスパラメータがある時とない時のifが複数箇所に記載されているため別フックまたはコンポーネントにまとめる
     if (!pathParameterTaskId) {
@@ -111,7 +100,7 @@ export default function TaskArea({
           feedbacks={item.feedbacks[0]}
           checks={item.checks[0]}
           onDelete={deleteTask}
-          isMinimum={isMinimum}
+          isMinimum={isMinimumDisplay}
           onAddTask={addTask}
           onAddTasks={addTasks}
           ticketItems={ticketItems}
@@ -127,8 +116,8 @@ export default function TaskArea({
   };
 
   useEffect(() => {
-    createdTopTask && setTaskItems([createdTopTask, ...taskItems]);
-  }, [createdTopTask]);
+    addTopTask && setTaskItems([addTopTask, ...taskItems]);
+  }, [addTopTask]);
 
   const addTask = async (addToTaskId: number) => {
     const { data } = await axios.post(

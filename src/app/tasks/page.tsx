@@ -1,73 +1,54 @@
 "use client";
 // FIXME: use clientを外してcomponentにTaskViewを映すべし
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import _ from "lodash";
-import type { Task as TaskType } from "@/schema/zod";
-import TaskArea from "../components/TaskArea";
-import TaskMenu from "../components/TaskMenu";
-import {
-  fetchAllTickets,
-  getTickets,
-  setTickets,
-} from "../features/ticketSlice";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store";
-import { Statuses } from "../constants/TaskConstants";
 import dayjs from "dayjs";
 
+import type { Task } from "@/schema/zod";
+import TaskArea from "../components/TaskArea";
+import TaskMenu from "../components/TaskMenu";
+import { getNotifyAbleTickets } from "../stores/ticketSlice";
+import { useSelector } from "react-redux";
+
 export default function TaskView() {
-  const [newTaskItem, setNewTaskItem] = useState<TaskType>(null);
-  const [isMinimum, setIsMinimum] = useState(true);
+  const [addTaskItem, setAddTaskItem] = useState<Task | null>(null);
+  const [isMinimumDisplay, setIsMinimumDisplay] = useState(true);
 
-  const tickets = useSelector(getTickets)
-    .map((ticket) => {
-      if (!ticket.isNotified && ticket.status != Statuses.Done)
-        return {
-          title: ticket.title,
-          isNotified: ticket.isNotified,
-          deadline: ticket.deadline,
-        };
-    })
-    .filter((ticket) => ticket);
-  const dispatch: AppDispatch = useDispatch();
+  const notifyAbleTickets = useSelector(getNotifyAbleTickets);
 
   useEffect(() => {
-    dispatch(fetchAllTickets());
-    Notification.requestPermission()
-  }, [dispatch]);
+    Notification.requestPermission();
+  }, []);
 
   useEffect(() => {
-    // TODO: イベントループではウインドウがアクティブではない場合に止まってしまうため、サービスワーカーに移設する
     setInterval(
       () => {
-        tickets.forEach((ticket) => {
-          // TODO: バグがあります。当日なのに1日の差がある
-          if (!ticket?.isNotified && dayjs(ticket.deadline, "d") == dayjs()) {
-            new Notification("本日締め切り当日", { body: ticket.title });
-          }
-          if (!ticket?.isNotified && dayjs().diff(ticket.deadline, "d") == 1) {
-            new Notification("本日締め切り1日前", { body: ticket.title });
-          }
-          if (!ticket?.isNotified && dayjs().diff(ticket.deadline, "d") == 2) {
-            new Notification("本日締め切り2日前", { body: ticket.title });
+        notifyAbleTickets.forEach((ticket) => {
+          const diff = dayjs().diff(ticket.deadline, "d");
+          if (!ticket?.isNotified && diff === 0) {
+            new Notification("👀締め切り当日", { body: ticket.title });
+          } else if (!ticket?.isNotified && diff === 1) {
+            new Notification("🔴締め切り1日前", { body: ticket.title });
+          } else if (!ticket?.isNotified && diff === 2) {
+            new Notification("❗️締め切り2日前", { body: ticket.title });
+          } else if (!ticket?.isNotified && diff > 2) {
+            new Notification("❌大幅な遅れ(2日以上)", { body: ticket.title });
           }
         });
-        console.log("a")
       },
       1000 * 60 * 60,
     );
-  }, [tickets]);
+  }, [notifyAbleTickets]);
 
   return (
     <div style={{ width: "100%" }}>
       <TaskMenu
-        onCreateTopTask={setNewTaskItem}
-        onMinimum={setIsMinimum}
-        isMinimum={isMinimum}
+        onCreateTopTask={setAddTaskItem}
+        onMinimumDisplay={setIsMinimumDisplay}
+        isMinimumDisplay={isMinimumDisplay}
       />
-      <TaskArea createdTopTask={newTaskItem} isMinimum={isMinimum} />
+      <TaskArea addTopTask={addTaskItem} isMinimumDisplay={isMinimumDisplay} />
     </div>
   );
 }

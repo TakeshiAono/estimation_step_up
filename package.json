@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "generate:type": "npx prisma migrate dev",
-    "prettier": "prettier --write ./src/app ./src/libs"
+    "fmt": "prettier --write ./src/app ./src/libs"
   },
   "dependencies": {
     "@date-io/date-fns": "^3.0.0",

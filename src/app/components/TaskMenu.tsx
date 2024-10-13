@@ -7,15 +7,15 @@ import { Statuses, TaskTypes } from "../constants/TaskConstants";
 
 type Props = {
   onCreateTopTask: (task: Task) => void;
-  onMinimum?: (isMinimum: boolean) => void;
-  isMinimum?: boolean;
+  onMinimumDisplay?: (isMinimum: boolean) => void;
+  isMinimumDisplay?: boolean;
   isChildTask?: boolean;
 };
 
 const TaskMenu = ({
   onCreateTopTask,
-  onMinimum,
-  isMinimum,
+  onMinimumDisplay,
+  isMinimumDisplay,
   isChildTask,
 }: Props) => {
   const [isHidden, setIsHidden] = useState(false);
@@ -76,10 +76,10 @@ const TaskMenu = ({
         color="success"
         style={{ marginRight: "20px" }}
         onClick={() => {
-          if (onMinimum) onMinimum((prev) => !prev);
+          if (onMinimumDisplay) onMinimumDisplay((prev) => !prev);
         }}
       >
-        {isMinimum ? "タスク通常表示" : "タスク最小表示"}
+        {isMinimumDisplay ? "タスク通常表示" : "タスク最小表示"}
       </Button>
       <Button
         variant="contained"
