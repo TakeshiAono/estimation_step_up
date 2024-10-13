@@ -606,6 +606,16 @@ export default function TicketView({
                 }}
               />
             </LocalizationProvider>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setEditTicketItem((ticketItem) => {
+                  return { ...ticketItem, deadline: null };
+                });
+              }}
+            >
+              日付リセット
+            </Button>
           </FormControl>
         </TicketModal>
       ) : (
@@ -653,7 +663,7 @@ export default function TicketView({
               <DatePicker
                 label="デッドライン"
                 onChange={(e) => {
-                  setDeadline(e.format());
+                  setDeadline(e?.format());
                 }}
               />
             </LocalizationProvider>

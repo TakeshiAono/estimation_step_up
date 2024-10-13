@@ -64,3 +64,7 @@ export async function createTimeAndOperatingTime(
     operatingTime: operatingTime - pastOperatingTime,
   });
 }
+
+export async function deleteTask(id: number) {
+  return await axios.delete<Task>(`http://localhost:3001/api/tasks/${id}`);
+}

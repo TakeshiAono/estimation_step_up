@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { fetchAllTickets, getTickets } from "../stores/ticketSlice";
 import { useSelector } from "react-redux";
 import { getAllTasks } from "../stores/taskSlice";
+import { deleteTask } from "../utils/apiUtil";
 
 type Props = {
   addTopTask: TaskType | null;
@@ -99,7 +100,7 @@ export default function TaskArea({
           plans={item.plans[0]}
           feedbacks={item.feedbacks[0]}
           checks={item.checks[0]}
-          onDelete={deleteTask}
+          onDelete={deleteTaskById}
           isMinimum={isMinimumDisplay}
           onAddTask={addTask}
           onAddTasks={addTasks}
@@ -192,10 +193,8 @@ export default function TaskArea({
     );
   };
 
-  const deleteTask = async ({ id }: { id: number }) => {
-    const response = await axios.delete(
-      `http://localhost:3001/api/tasks/${id}`,
-    );
+  const deleteTaskById = async ({ id }: { id: number }) => {
+    const response = await deleteTask(id);
     if (response.status === 200) {
       const exclusionTaskItems = _.filter(
         taskItems,
