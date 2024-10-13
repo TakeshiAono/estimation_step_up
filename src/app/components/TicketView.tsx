@@ -29,11 +29,9 @@ import { Statuses } from "../constants/TaskConstants";
 import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
-import {
-  fetchAllTasks,
-  getTasksGroupedByTicket,
-  setTasks,
-} from "../stores/taskSlice";
+import { getTasksGroupedByTicket, setTasks } from "../stores/taskSlice";
+import useTicketNotification from "../hooks/useTicketNotification";
+import { fetchAllTickets } from "../stores/ticketSlice";
 
 type Props = {
   holidayList: string[];
@@ -56,6 +54,8 @@ export default function TicketView({
     holidays: holidayList,
     holidayFormat: "YYYY/MM/DD",
   });
+
+  useTicketNotification();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -87,6 +87,7 @@ export default function TicketView({
   };
 
   useEffect(() => {
+    dispatch(fetchAllTickets());
     dispatch(setTasks(tasks));
   }, []);
 
