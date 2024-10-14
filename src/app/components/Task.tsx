@@ -1,8 +1,6 @@
 import {
   Button,
-  colors,
   FormControl,
-  InputAdornment,
   InputLabel,
   Link,
   MenuItem,
@@ -18,10 +16,8 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import _ from "lodash";
 import {
-  DateCalendar,
   DateTimePicker,
   LocalizationProvider,
-  TimeClock,
   TimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -29,7 +25,6 @@ import { Statuses, TaskTypes } from "@/app/constants/TaskConstants";
 import type { Task } from "@/schema/zod";
 import dayjs from "dayjs";
 import { v4 as uuid } from "uuid";
-import seedrandom from "seedrandom";
 import { GaugeComponent } from "react-gauge-component";
 
 import TaskModal from "./TaskModal";
@@ -40,6 +35,7 @@ import {
   mutateTimeAndOperatingTime,
   saveTaskTerm,
 } from "../utils/apiUtil";
+import useTaskNotification from "../hooks/useTaskNotification";
 
 type Props = {
   seconds: number;
@@ -166,6 +162,8 @@ const Task = ({
         100,
     );
   };
+
+  useTaskNotification(task, doneTimeRate(), progressRate);
 
   useEffect(() => {
     if (!isInitialRender.current) {
