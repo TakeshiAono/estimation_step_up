@@ -304,7 +304,7 @@ export default function TaskArea({
             setTaskItems(event.items);
           }}
           disableCollapse={true}
-          disableDrag={false}
+          disableDrag={true}
           collapsed={isHidden}
         />
       )}
