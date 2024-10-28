@@ -9,9 +9,9 @@ type Props = {
   volume: number;
   isResetSound: boolean;
   onSoundPlay: () => void;
-}
+};
 
-const useLimitSound = ({volume, isResetSound, onSoundPlay}: Props) => {
+const useLimitSound = ({ volume, isResetSound, onSoundPlay }: Props) => {
   const [operationSoundPlay] = useSound(operationEndSound, {
     volume: volume / 100,
   });
@@ -29,7 +29,7 @@ const useLimitSound = ({volume, isResetSound, onSoundPlay}: Props) => {
         })();
   };
 
-  return soundPlay
-}
+  return soundPlay;
+};
 
 export default useLimitSound;

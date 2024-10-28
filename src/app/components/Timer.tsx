@@ -65,7 +65,11 @@ const Timer = ({
     }, 10);
   };
 
-  const soundPlay = useLimitSound({volume, isResetSound: isResting, onSoundPlay: timerReset});
+  const soundPlay = useLimitSound({
+    volume,
+    isResetSound: isResting,
+    onSoundPlay: timerReset,
+  });
 
   useEffect(() => {
     isInitialRender.current = false;
