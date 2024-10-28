@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
 import { Button, InputLabel, Slider, Stack, TextField } from "@mui/material";
-// @ts-ignore
-import operationEndSound from "./../assets/operation_end.mp3";
-import notifySound from "./../assets/notify.mp3";
-// @ts-ignore
-import restEndSound from "./../assets/rest_end.mp3";
-import styles from "../css/Timer.module.css";
 import { VirtualWindow } from "@react-libraries/virtual-window";
 
+import notifySound from "./../assets/notify.mp3";
+import styles from "../css/Timer.module.css";
 import VolumeSlider from "./VolumeSlider";
+import useLimitSound from "../hooks/useLimitSound";
 
 let worker = new Worker(new URL("../../libs/secondsTimer.ts", import.meta.url));
 
@@ -43,10 +40,6 @@ const Timer = ({
   const [volume, setVolume] = useState(
     Number(localStorage.getItem("volume")) || 50,
   );
-  const [operationSoundPlay] = useSound(operationEndSound, {
-    volume: volume / 100,
-  });
-  const [restSoundPlay] = useSound(restEndSound, { volume: volume / 100 });
   const [notifySoundPlay] = useSound(notifySound, { volume: volume / 100 });
   const [isInputHidden, setIsInputHidden] = useState(false);
   const [sumTime, setSumTime] = useState(
@@ -62,6 +55,17 @@ const Timer = ({
   const [inputRestMinutes, setInputRestMinutes] = useState(
     Number(localStorage.getItem("inputRestMinutes")) || initializeRestSeconds,
   );
+
+  const timerReset = () => {
+    timerPause();
+    setSumTime(0);
+    setTimeout(() => {
+      setOperatingSeconds(inputOperatingMinutes * 60);
+      setRestSeconds(inputRestMinutes * 60);
+    }, 10);
+  };
+
+  const soundPlay = useLimitSound({volume, isResetSound: isResting, onSoundPlay: timerReset});
 
   useEffect(() => {
     isInitialRender.current = false;
@@ -124,15 +128,6 @@ const Timer = ({
     }
   }, [sumTime]);
 
-  const timerReset = () => {
-    timerPause();
-    setSumTime(0);
-    setTimeout(() => {
-      setOperatingSeconds(inputOperatingMinutes * 60);
-      setRestSeconds(inputRestMinutes * 60);
-    }, 10);
-  };
-
   const timerPause = () => {
     worker.postMessage("stop");
     setIsStarting(false);
@@ -150,18 +145,6 @@ const Timer = ({
     timerReset();
     localStorage.setItem("isResting", `${!isResting}`);
     setIsResting(!isResting);
-  };
-
-  const soundPlay = () => {
-    isResting
-      ? (() => {
-          restSoundPlay();
-          timerReset();
-        })()
-      : (() => {
-          operationSoundPlay();
-          timerReset();
-        })();
   };
 
   return (
