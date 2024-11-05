@@ -297,7 +297,7 @@ const Task = ({
             alignItems: "center",
           }}
         >
-          <span>進捗率</span>
+          <span>実質進捗率</span>
           <GaugeComponent
             arc={{
               subArcs: [
@@ -335,7 +335,7 @@ const Task = ({
               alignItems: "center",
             }}
           >
-            <span>稼働時間/予想完了時間</span>
+            <span>最低進捗率</span>
             <GaugeComponent
               arc={{
                 subArcs: [
